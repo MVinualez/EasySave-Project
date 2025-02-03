@@ -2,8 +2,8 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace easysave_project.ViewModels {
-    internal class MainViewModel : INotifyPropertyChanged {
+namespace easysave_project.Controller {
+    internal class MainViewController : INotifyPropertyChanged {
         public event PropertyChangedEventHandler? PropertyChanged;
 
         private int _selectedIndex;
@@ -32,7 +32,7 @@ namespace easysave_project.ViewModels {
 
         public List<MenuAction> MenuActions => _menuActions;
 
-        public MainViewModel() {
+        public MainViewController() {
             InitializeMenuActions();
         }
 

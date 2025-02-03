@@ -9,10 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Log\" />
-    <Folder Include="Controller\" />
+    <Compile Remove="State\**" />
+    <EmbeddedResource Remove="State\**" />
+    <None Remove="State\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Service\" />
-    <Folder Include="State\" />
   </ItemGroup>
 
 </Project>

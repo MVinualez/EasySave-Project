@@ -1,18 +1,18 @@
-﻿using easysave_project.ViewModels;
+﻿using easysave_project.Controller;
 using System.ComponentModel;
 using System.Text;
 
 namespace easysave_project.View {
     internal class MenuView {
-        private readonly MainViewModel _viewModel;
+        private readonly MainViewController _viewModel;
 
-        public MenuView(MainViewModel viewModel) {
+        public MenuView(MainViewController viewModel) {
             _viewModel = viewModel;
             _viewModel.PropertyChanged += ViewModel_PropertyChanged;
         }
 
         private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
-            if (e.PropertyName == nameof(MainViewModel.SelectedIndex)) {
+            if (e.PropertyName == nameof(MainViewController.SelectedIndex)) {
                 Display();
             }
         }
