@@ -9,17 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Controller\**" />
-    <Compile Remove="Service\**" />
-    <EmbeddedResource Remove="Controller\**" />
-    <EmbeddedResource Remove="Service\**" />
-    <None Remove="Controller\**" />
-    <None Remove="Service\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Log\" />
-    <Folder Include="State\" />
+    <Folder Include="Controllers\" />
+    <Folder Include="Services\" />
   </ItemGroup>
 
   <ItemGroup>
