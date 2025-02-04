@@ -1,6 +1,8 @@
 ﻿using easysave_project.Models;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using easysave_project.Controllers;
+using easysave_project.Services;
 
 namespace easysave_project.ViewModels {
     internal class MainViewModel : INotifyPropertyChanged {
@@ -9,6 +11,8 @@ namespace easysave_project.ViewModels {
         private int _selectedIndex;
         private bool _isRunning = true;
         private List<MenuAction> _menuActions = new();
+        private readonly BackupJobController _backupJobController;
+
 
         public int SelectedIndex {
             get => _selectedIndex;
@@ -34,6 +38,9 @@ namespace easysave_project.ViewModels {
 
         public MainViewModel() {
             InitializeMenuActions();
+            var backupService = new BackupService();
+            _backupJobController = new BackupJobController(backupService);
+    
         }
 
         private void InitializeMenuActions() {
@@ -48,6 +55,16 @@ namespace easysave_project.ViewModels {
         private void ExecuteBackup() {
             Console.Clear();
             Console.WriteLine("🚀 Début de la sauvegarde...");
+            Console.Write("📂 Entrez le chemin du dossier source : ");
+            string sourcePath = Console.ReadLine() ?? "";
+
+            Console.Write("💾 Entrez le chemin du dossier de destination : ");
+            string destinationPath = Console.ReadLine() ?? "";
+
+            Console.Write("🛠️ Type de sauvegarde (1 = complète, 2 = différentielle) : ");
+            bool isFullBackup = (Console.ReadLine() ?? "1") == "1";
+
+            _backupJobController.StartBackup("Sauvegarde utilisateur", sourcePath, destinationPath, isFullBackup);
             WaitForKeyPress();
         }
 
