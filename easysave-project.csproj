@@ -9,13 +9,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="State\**" />
-    <EmbeddedResource Remove="State\**" />
-    <None Remove="State\**" />
+    <Compile Remove="Controller\**" />
+    <Compile Remove="Service\**" />
+    <EmbeddedResource Remove="Controller\**" />
+    <EmbeddedResource Remove="Service\**" />
+    <None Remove="Controller\**" />
+    <None Remove="Service\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Service\" />
+    <Folder Include="Log\" />
+    <Folder Include="State\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
 </Project>
