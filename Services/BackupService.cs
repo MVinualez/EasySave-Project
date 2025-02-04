@@ -96,6 +96,49 @@ namespace easysave_project.Services
             }
         }
 
+        public void RunRestauration(BackupJob job)
+        {
+            Console.WriteLine($"🔄 Démarrage de la restauration : {job.Name}");
+
+            if (!Directory.Exists(job.Destination))
+            {
+                Console.WriteLine("⚠️ Aucune sauvegarde trouvée à cet emplacement !");
+                return;
+            }
+
+            try
+            {
+                Directory.CreateDirectory(job.Source);
+
+                string[] backupFiles = Directory.GetFiles(job.Destination);
+                int restoredFiles = 0;
+
+                foreach (var backupFile in backupFiles)
+                {
+                    string fileName = Path.GetFileName(backupFile);
+                    string originalFile = Path.Combine(job.Source, fileName);
+
+                    File.Copy(backupFile, originalFile, true);
+                    Console.WriteLine($"✅ {fileName} restauré !");
+                    restoredFiles++;
+                }
+
+                if (restoredFiles == 0)
+                {
+                    Console.WriteLine("✨ Aucun fichier à restaurer.");
+                }
+                else
+                {
+                    Console.WriteLine($"🎉 Restauration terminée ! {restoredFiles} fichiers restaurés.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erreur lors de la restauration : {ex.Message}");
+            }
+
+        }
+
 
     }
 }

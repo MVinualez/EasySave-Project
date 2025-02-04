@@ -43,8 +43,8 @@ namespace easysave_project.ViewModels {
             var backupService = new BackupService();
             _backupJobController = new BackupJobController(backupService);
             _logController = new LogController();
-          
-    
+
+             
         }
 
         private void InitializeMenuActions() {
