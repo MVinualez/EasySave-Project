@@ -8,5 +8,5 @@ class Program {
         var viewModel = new MainViewModel();
         var menuView = new MenuView(viewModel);
         menuView.Run();
-    }   
+    }
 }
