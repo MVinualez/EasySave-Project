@@ -7,6 +7,7 @@ using System.Xml;
 using System.IO;
 using Newtonsoft.Json;
 using easysave_project.Models;
+using System.Reflection;
 
 namespace easysave_project.Controllers
 {
@@ -23,7 +24,7 @@ namespace easysave_project.Controllers
         }
         // Méthode LogController de la classe LogController qui utilise la méthode Exists de la classe System.IO.Directory et prends en paramètre la variable logDirectory
         // Permet de vérifier si le dossier Logs existe et sinon le créer.
-        public void SaveLog(LogEntry log) // Création de la méthode Savelog qui appelle la méthode LogEntry de /Models/logEntry 
+        public string SaveLog(LogEntry log) // Création de la méthode Savelog qui appelle la méthode LogEntry de /Models/logEntry 
         {
             string logFileName = $"{DateTime.Now:yyyy-MM-dd}.json"; 
             string logFilePath = Path.Combine(logDirectory, logFileName);
@@ -40,6 +41,11 @@ namespace easysave_project.Controllers
             // Ajouter la nouvelle entrée et sauvegarder
             logEntries.Add(log);
             File.WriteAllText(logFilePath, JsonConvert.SerializeObject(logEntries, Newtonsoft.Json.Formatting.Indented));
+            string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName);
+            string dirName = "Logs";
+            string fileName = logFilePath;
+            string fullPath = Path.Combine(path, dirName, fileName);
+            return fullPath;
         }
     }
 }
