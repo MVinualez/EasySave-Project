@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using easysave_project.Controllers;
 using easysave_project.Services;
+using System.Diagnostics;
 
 namespace easysave_project.Controller {
     internal class MainViewController : INotifyPropertyChanged {
@@ -12,6 +13,7 @@ namespace easysave_project.Controller {
         private bool _isRunning = true;
         private List<MenuAction> _menuActions = new();
         private readonly BackupJobController _backupJobController;
+        private readonly LogController _logController;
 
 
         public int SelectedIndex {
@@ -40,6 +42,8 @@ namespace easysave_project.Controller {
             InitializeMenuActions();
             var backupService = new BackupService();
             _backupJobController = new BackupJobController(backupService);
+            _logController = new LogController();
+          
     
         }
 
@@ -55,8 +59,13 @@ namespace easysave_project.Controller {
         private void ExecuteBackup() {
             Console.Clear();
             Console.WriteLine("🚀 Début de la sauvegarde...");
+            Console.WriteLine("Entrez le nom de la sauvegarde");
+            string nomSauvegarde = Console.ReadLine() ?? "";
+
             Console.Write("📂 Entrez le chemin du dossier source : ");
             string sourcePath = Console.ReadLine() ?? "";
+            DirectoryInfo di = new DirectoryInfo(sourcePath);
+            long fileSize = di.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(fi => fi.Length);
 
             Console.Write("💾 Entrez le chemin du dossier de destination : ");
             string destinationPath = Console.ReadLine() ?? "";
@@ -64,8 +73,30 @@ namespace easysave_project.Controller {
             Console.Write("🛠️ Type de sauvegarde (1 = complète, 2 = différentielle) : ");
             bool isFullBackup = (Console.ReadLine() ?? "1") == "1";
 
-            _backupJobController.StartBackup("Sauvegarde utilisateur", sourcePath, destinationPath, isFullBackup);
-            WaitForKeyPress();
+            switch (Console.ReadLine()) {
+
+                case "2":
+
+                    Stopwatch stopwatchCase2 = Stopwatch.StartNew();
+                    _backupJobController.StartBackup(nomSauvegarde, sourcePath, destinationPath, isFullBackup);
+                    WaitForKeyPress();
+                    stopwatchCase2.Stop();
+                    double elapsedTimeCase2 = stopwatchCase2.Elapsed.TotalSeconds;
+                    LogEntry logEntryCase2 = new LogEntry(nomSauvegarde, sourcePath, destinationPath, fileSize, elapsedTimeCase2);
+                    _logController.SaveLog(logEntryCase2);
+                    break;
+
+                default :
+                    Stopwatch stopwatch = Stopwatch.StartNew();
+                    _backupJobController.StartDiffBackup(nomSauvegarde, sourcePath, destinationPath, isFullBackup);
+                    WaitForKeyPress();
+                    stopwatch.Stop();
+                    double elapsedTime = stopwatch.Elapsed.TotalSeconds;
+                    LogEntry logEntry = new LogEntry(nomSauvegarde, sourcePath, destinationPath, fileSize, elapsedTime);
+                    _logController.SaveLog(logEntry);
+                    break;
+        }    
+
         }
 
         private void ExecuteRestore() {

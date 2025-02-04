@@ -17,5 +17,11 @@ namespace easysave_project.Controllers
             var job = new BackupJob(name, source, destination, isFullBackup);
             _backupService.RunBackup(job);
         }
+
+        public void StartDiffBackup(string name, string source, string destination, bool isFullBackup) {
+            var job = new BackupJob(name, source, destination, isFullBackup);
+            _backupService.RunDifferentialBackup(job);
+
+        }
     }
 }
