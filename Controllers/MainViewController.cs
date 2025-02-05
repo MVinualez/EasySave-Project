@@ -65,6 +65,42 @@ namespace easysave_project.Controllers
             };
         }
 
+        public void stateCreator(string backupJobName, string sourcePath, string destinationPath)
+        {
+            StateService stateService = new StateService("state/state.json");
+
+            stateService.GetCurrentStateFile();
+           
+            stateService.StartJob(backupJobName);
+            if (!Directory.Exists(sourcePath))
+            {
+                Console.WriteLine("⚠️ Le dossier source n'existe pas.");
+                return;
+            }
+            string[] files = Directory.GetFiles(sourcePath);
+
+            foreach (var file in files)
+            {
+                string fileName = Path.GetFileName(file);
+                string destFile = Path.Combine(destinationPath, fileName);
+                long fileSize = new FileInfo(file).Length;
+                int fileSizeInt = (int)fileSize;
+
+                stateService.AddFileToState(backupJobName, file, destFile, fileSizeInt);
+               
+                Console.WriteLine($"📂 Transfert en cours : {fileName}");
+                File.Copy(file, destFile, true);
+
+                stateService.UpdateFileTransfer(backupJobName, file, fileSizeInt);
+            }
+            stateService.CompleteJob(backupJobName);
+
+            Console.WriteLine("🎉 Sauvegarde terminée et état mis à jour !");
+        
+
+
+    }
+
         private void ExecuteBackup()
         {
             Console.Clear();
@@ -83,6 +119,8 @@ namespace easysave_project.Controllers
             Console.Write("🛠️ Type de sauvegarde (1 = complète, 2 = différentielle) : ");
             bool isFullBackup = (Console.ReadLine() ?? "1") == "1";
 
+           stateCreator(nomSauvegarde, sourcePath, destinationPath);
+
             switch (Console.ReadLine())
             {
 
@@ -98,6 +136,8 @@ namespace easysave_project.Controllers
                     break;
 
                 default:
+
+                    stateCreator(nomSauvegarde, sourcePath, destinationPath);
                     Stopwatch stopwatch = Stopwatch.StartNew();
                     _backupJobController.StartDiffBackup(nomSauvegarde, sourcePath, destinationPath, isFullBackup);
                     WaitForKeyPress();
