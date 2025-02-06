@@ -4,7 +4,7 @@ using System.Resources;
 using static System.Net.Mime.MediaTypeNames;
 using System.Runtime.Intrinsics.X86;
 
-namespace easysave_project.Controller {
+namespace easysave_project.Controllers {
     internal class LanguageController {
         private ResourceManager _resourceManager;
         private string _currentLanguage = "en";
@@ -31,15 +31,15 @@ namespace easysave_project.Controller {
         public string GetResource(string name) {
             try {
                 string? value = _resourceManager.GetString(name);
-                if(value != null) {
+                if (value != null) {
                     return value;
                 } else {
                     return $"Resource '{name}' not found";
-                }   
+                }
             } catch {
                 return "";
             }
-                     
+
         }
 
         public void ShowLanguageMenu() {
@@ -80,7 +80,7 @@ namespace easysave_project.Controller {
             if (languages[languageIndex] == "Cancel") {
                 Console.Clear();
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("❌ " + this.GetResource("CancelLanguageSelection"));
+                Console.WriteLine("❌ " + GetResource("CancelLanguageSelection"));
                 Console.ResetColor();
                 WaitForKeyPress();
                 return;
@@ -89,26 +89,26 @@ namespace easysave_project.Controller {
             ChangeLanguage(languages[languageIndex]);
         }
 
-        private void ChangeLanguage(string newLanguage, bool clear=true) {
+        private void ChangeLanguage(string newLanguage, bool clear = true) {
             CurrentLanguage = newLanguage;
 
-            if(GetResource("SelectLanguage") == "") {
+            if (GetResource("SelectLanguage") == "") {
                 Console.Clear();
                 Console.WriteLine("Requested language not found, use English");
                 ChangeLanguage("en", false);
             } else {
-                if(clear) {
+                if (clear) {
                     Console.Clear();
                 }
-                Console.WriteLine("✅ " + this.GetResource("LanguageChanged") +$" {newLanguage.ToUpper()}");
+                Console.WriteLine("✅ " + GetResource("LanguageChanged") + $" {newLanguage.ToUpper()}");
                 WaitForKeyPress();
             }
 
-            
+
         }
 
         private void WaitForKeyPress() {
-            Console.WriteLine(this.GetResource("ReturnToMenu"));
+            Console.WriteLine(GetResource("ReturnToMenu"));
             Console.ReadKey();
         }
     }

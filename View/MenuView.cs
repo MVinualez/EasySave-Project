@@ -1,8 +1,9 @@
-﻿using easysave_project.Controller;
+﻿using easysave_project.Controllers;
 using System.ComponentModel;
 using System.Text;
 
-namespace easysave_project.View {
+namespace easysave_project.View
+{
     internal class MenuView {
         private readonly MainViewController _viewModel;
             
