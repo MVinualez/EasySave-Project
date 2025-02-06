@@ -1,4 +1,6 @@
 ﻿using easysave_project.Models;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -9,6 +11,7 @@ namespace easysave_project.Controller {
         private int _selectedIndex;
         private bool _isRunning = true;
         private List<MenuAction> _menuActions = new();
+        private readonly LanguageController _languageController;
 
         public int SelectedIndex {
             get => _selectedIndex;
@@ -33,32 +36,35 @@ namespace easysave_project.Controller {
         public List<MenuAction> MenuActions => _menuActions;
 
         public MainViewController() {
+            _languageController = new LanguageController();
+            _languageController.LanguageChanged += (sender, args) => InitializeMenuActions();
             InitializeMenuActions();
         }
 
         private void InitializeMenuActions() {
             _menuActions = new List<MenuAction>
             {
-                new MenuAction("Lancer une sauvegarde", ExecuteBackup),
-                new MenuAction("Restaurer une sauvegarde", ExecuteRestore),
-                new MenuAction("Quitter", () => IsRunning = false),
+                new MenuAction(_languageController.GetResource("Backup"), ExecuteBackup),
+                new MenuAction(_languageController.GetResource("Restore"), ExecuteRestore),
+                new MenuAction(_languageController.GetResource("ChangeLanguage"), _languageController.ShowLanguageMenu),
+                new MenuAction(_languageController.GetResource("Exit"), () => IsRunning = false),
             };
         }
 
         private void ExecuteBackup() {
             Console.Clear();
-            Console.WriteLine("🚀 Début de la sauvegarde...");
+            Console.WriteLine("🚀 " + _languageController.GetResource("Backup"));
             WaitForKeyPress();
         }
 
         private void ExecuteRestore() {
             Console.Clear();
-            Console.WriteLine("🔄 Début de la restauration...");
+            Console.WriteLine("🔄 " + _languageController.GetResource("Restore"));
             WaitForKeyPress();
         }
 
         private void WaitForKeyPress() {
-            Console.WriteLine("Appuyez sur une touche pour revenir au menu...");
+            Console.WriteLine(_languageController.GetResource("ReturnToMenu"));
             Console.ReadKey();
         }
 
