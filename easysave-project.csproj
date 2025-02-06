@@ -9,17 +9,31 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="Services\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NPlant" Version="0.1.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\EasySaveLibrary\EasySaveLibrary\EasySaveLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Ressources\Ressource_fr.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Ressource_fr.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Ressources\Ressource_fr.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Ressource_fr.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controller\" />
   </ItemGroup>
 
 </Project>
