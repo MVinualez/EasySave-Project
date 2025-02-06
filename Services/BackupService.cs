@@ -45,7 +45,8 @@ namespace easysave_project.Services
                     string fileName = Path.GetFileName(file);
                     string destFile = Path.Combine(job.Destination, fileName);
                     string destFileBackcup = Path.Combine(fullPathBackup, fileName);
-                    File.Copy(file, destFile, true);
+                    CopyDirectoryRecursively(job.Source, job.Destination);
+                    CopyDirectoryRecursively(job.Source, fullPathBackup);
                     File.Copy(file, destFileBackcup, true);
                     Console.WriteLine($"✅ {fileName} copié !");
                     Console.WriteLine($"✅ {fileName} copié dans el Backup !");
@@ -59,6 +60,21 @@ namespace easysave_project.Services
             }
         }
 
+        private void CopyDirectoryRecursively(string sourceDir, string targetDir)
+        {
+            foreach (string dir in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories))
+            {
+                string targetSubDir = dir.Replace(sourceDir, targetDir);
+                Directory.CreateDirectory(targetSubDir);
+            }
+
+            foreach (string file in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
+            {
+                string destFile = file.Replace(sourceDir, targetDir);
+                File.Copy(file, destFile, true);
+                Console.WriteLine($"✅ {file} → {destFile}");
+            }
+        }
         public void RunDifferentialBackup(BackupJob job)
         {
             Console.WriteLine($"🔄 Démarrage de la sauvegarde différentielle : {job.Name}");
@@ -89,7 +105,7 @@ namespace easysave_project.Services
 
                     if (!existingFiles.Contains(fileName) || File.GetLastWriteTime(file) > File.GetLastWriteTime(destFile))
                     {
-                        File.Copy(file, destFile, true);
+                        CopyModifiedFilesRecursively(job.Source, job.Destination);
                         Console.WriteLine($"✅ {fileName} copié !");
                         copiedFiles++;
                     }
@@ -109,6 +125,30 @@ namespace easysave_project.Services
                 Console.WriteLine($"❌ Erreur : {ex.Message}");
             }
         }
+
+        private void CopyModifiedFilesRecursively(string sourceDir, string targetDir)
+        {
+            foreach (string dir in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories))
+            {
+                string targetSubDir = dir.Replace(sourceDir, targetDir);
+                if (!Directory.Exists(targetSubDir))
+                {
+                    Directory.CreateDirectory(targetSubDir);
+                }
+            }
+
+            foreach (string file in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
+            {
+                string destFile = file.Replace(sourceDir, targetDir);
+
+                if (!File.Exists(destFile) || File.GetLastWriteTime(file) > File.GetLastWriteTime(destFile))
+                {
+                    File.Copy(file, destFile, true);
+                    Console.WriteLine($"✅ {file} → {destFile}");
+                }
+            }
+        }
+
 
         public void RunRestauration(BackupJob job)
         {
