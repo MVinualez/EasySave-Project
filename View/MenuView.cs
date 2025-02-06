@@ -6,7 +6,7 @@ namespace easysave_project.View
 {
     internal class MenuView {
         private readonly MainViewController _viewModel;
-
+            
         public MenuView(MainViewController viewModel) {
             _viewModel = viewModel;
             _viewModel.PropertyChanged += ViewModel_PropertyChanged;

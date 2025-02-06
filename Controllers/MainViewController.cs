@@ -4,8 +4,7 @@ using System.Runtime.CompilerServices;
 using easysave_project.Services;
 using System.Diagnostics;
 
-namespace easysave_project.Controllers
-{
+namespace easysave_project.Controllers {
     internal class MainViewController : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -15,6 +14,7 @@ namespace easysave_project.Controllers
         private List<MenuAction> _menuActions = new();
         private readonly BackupJobController _backupJobController;
         private readonly LogController _logController;
+        private readonly LanguageController _languageController;
 
 
         public int SelectedIndex
@@ -47,6 +47,9 @@ namespace easysave_project.Controllers
 
         public MainViewController()
         {
+            _languageController = new LanguageController();
+            _languageController.LanguageChanged += (sender, args) => InitializeMenuActions();
+
             InitializeMenuActions();
             var backupService = new BackupService();
             _backupJobController = new BackupJobController(backupService);
@@ -55,13 +58,13 @@ namespace easysave_project.Controllers
 
         }
 
-        private void InitializeMenuActions()
-        {
+        private void InitializeMenuActions() {
             _menuActions = new List<MenuAction>
             {
-                new MenuAction("Lancer une sauvegarde", ExecuteBackup),
-                new MenuAction("Restaurer une sauvegarde", ExecuteRestore),
-                new MenuAction("Quitter", () => IsRunning = false),
+                new MenuAction(_languageController.GetResource("Backup"), ExecuteBackup),
+                new MenuAction(_languageController.GetResource("Restore"), ExecuteRestore),
+                new MenuAction(_languageController.GetResource("ChangeLanguage"), _languageController.ShowLanguageMenu),
+                new MenuAction(_languageController.GetResource("Exit"), () => IsRunning = false),
             };
         }
 
