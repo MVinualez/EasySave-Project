@@ -1,6 +1,8 @@
 ﻿using easysave_project.View;
 using easysave_project.Controllers;
 using easysave_project.Models;
+using EasySaveLibrary.Controllers;
+using EasySaveLibrary.Models;
 
 class Program {
     static void Main(String[] args) {
