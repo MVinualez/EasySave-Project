@@ -119,12 +119,24 @@ namespace easysave_project.Controllers
             Console.Write("🛠️ Type de sauvegarde (1 = complète, 2 = différentielle) : ");
             bool isFullBackup = (Console.ReadLine() ?? "1") == "1";
 
-           stateCreator(nomSauvegarde, sourcePath, destinationPath);
+            stateCreator(nomSauvegarde, sourcePath, destinationPath);
+
 
             switch (Console.ReadLine())
             {
 
                 case "2":
+                    
+                    Stopwatch stopwatch = Stopwatch.StartNew();
+                    _backupJobController.StartDiffBackup(nomSauvegarde, sourcePath, destinationPath, isFullBackup);
+                    WaitForKeyPress();
+                    stopwatch.Stop();
+                    double elapsedTime = stopwatch.Elapsed.TotalSeconds;
+                    LogEntry logEntry = new LogEntry(nomSauvegarde, sourcePath, destinationPath, fileSize, elapsedTime);
+                    _logController.SaveLog(logEntry);
+                    break;
+
+                default:
 
                     Stopwatch stopwatchCase2 = Stopwatch.StartNew();
                     _backupJobController.StartBackup(nomSauvegarde, sourcePath, destinationPath, isFullBackup);
@@ -135,17 +147,7 @@ namespace easysave_project.Controllers
                     _logController.SaveLog(logEntryCase2);
                     break;
 
-                default:
 
-                    stateCreator(nomSauvegarde, sourcePath, destinationPath);
-                    Stopwatch stopwatch = Stopwatch.StartNew();
-                    _backupJobController.StartDiffBackup(nomSauvegarde, sourcePath, destinationPath, isFullBackup);
-                    WaitForKeyPress();
-                    stopwatch.Stop();
-                    double elapsedTime = stopwatch.Elapsed.TotalSeconds;
-                    LogEntry logEntry = new LogEntry(nomSauvegarde, sourcePath, destinationPath, fileSize, elapsedTime);
-                    _logController.SaveLog(logEntry);
-                    break;
             }
 
         }
@@ -154,6 +156,16 @@ namespace easysave_project.Controllers
         {
             Console.Clear();
             Console.WriteLine("🔄 Début de la restauration...");
+
+            Console.Write("📂 Nom de la sauvegarde à restaurer : ");
+            string backupName = Console.ReadLine() ?? "";
+
+            Console.Write("🛠️ Type de restauration (1 = complète, 2 = différentielle) : ");
+            bool isFullRestore = (Console.ReadLine() ?? "1") == "1";
+
+            RestoreService restoreService = new RestoreService();
+            restoreService.RestoreBackup(backupName, isFullRestore);
+
             WaitForKeyPress();
         }
 

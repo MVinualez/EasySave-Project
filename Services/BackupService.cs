@@ -3,6 +3,7 @@ using easysave_project.Controllers;
 using System;
 using System.IO;
 using System.Xml.Linq;
+using System.Reflection;
 
 namespace easysave_project.Services
 {
@@ -13,6 +14,16 @@ namespace easysave_project.Services
         
         public void RunBackup(BackupJob job)
         {
+            string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName);
+            path = path != null && path.Length >= 1 ? path : Directory.GetCurrentDirectory();
+
+            string dirName = "Backup";
+            string fullPathBackup = Path.Combine(path, dirName);
+            if (!Directory.Exists(Path.Combine(path, dirName)))
+            {
+                Directory.CreateDirectory(Path.Combine(path, dirName));
+            }
+
             Console.WriteLine($"Démarrage de la sauvegarde : {job.Name}");
             Console.WriteLine($"Source : {job.Source}");
             Console.WriteLine($"Destination : {job.Destination}");
@@ -33,8 +44,11 @@ namespace easysave_project.Services
                 {
                     string fileName = Path.GetFileName(file);
                     string destFile = Path.Combine(job.Destination, fileName);
+                    string destFileBackcup = Path.Combine(fullPathBackup, fileName);
                     File.Copy(file, destFile, true);
+                    File.Copy(file, destFileBackcup, true);
                     Console.WriteLine($"✅ {fileName} copié !");
+                    Console.WriteLine($"✅ {fileName} copié dans el Backup !");
                 }
 
                 Console.WriteLine("🎉 Sauvegarde terminée !");
@@ -83,7 +97,7 @@ namespace easysave_project.Services
 
                 if (copiedFiles == 0)
                 {
-                    Console.WriteLine("✨ Aucun fichier n'a été modifié, rien à copier.");
+                    Console.WriteLine("✨ Aucun nouveau fichier, rien à bouger.");
                 }
                 else
                 {
