@@ -4,6 +4,8 @@ using System;
 using System.IO;
 using System.Xml.Linq;
 using System.Reflection;
+using EasySaveLibrary.Controllers;
+using EasySaveLibrary.Models;
 
 namespace easysave_project.Services
 {
