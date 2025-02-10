@@ -5,7 +5,7 @@ namespace easysave_project.Models
         public string Name { get; set; }
         public string Source { get; set; }
         public string Destination { get; set; }
-        public bool IsFullBackup { get; set; } // true = complète, false = différentielle
+        public bool IsFullBackup { get; set; } // true = full, false = differential
 
         public BackupJob(string name, string source, string destination, bool isFullBackup)
         {
