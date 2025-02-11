@@ -1,17 +1,17 @@
 ﻿using easysave_project.Models;
 using easysave_project.Controllers;
-using EasySaveLibrary.Controllers;
-using EasySaveLibrary.Models;
 using System;
 using System.IO;
 using System.Xml.Linq;
 using System.Reflection;
+using EasySaveLibrary.Controllers;
+using EasySaveLibrary.Models;
 
 namespace easysave_project.Services
 {
     internal class BackupService
     {
-        LogController logController = new LogController() ;
+        LogController logController = new LogController();
         LogEntry logEntry;
         
         public void RunBackup(BackupJob job)

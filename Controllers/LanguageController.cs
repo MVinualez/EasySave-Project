@@ -24,7 +24,6 @@ namespace easysave_project.Controllers {
             }
         }
 
-
         public LanguageController() {
             _resourceManager = new ResourceManager($"easysave_project.Ressources.ressource_{_currentLanguage}", typeof(LanguageController).Assembly);
         }
@@ -43,17 +42,12 @@ namespace easysave_project.Controllers {
 
         }
 
-        public void ShowParameterMenu() {
+        public void ShowLanguageMenu() {
             int languageIndex = Array.IndexOf(new[] { "fr", "en", "es", "de" }, _currentLanguage);
             if (languageIndex == -1) languageIndex = 0;
 
-            string _currentFormat = "JSON";
-            int logParameterIndex = Array.IndexOf(new[] { "JSON", "XML" }, _currentFormat);
-            if (logParameterIndex == -1) logParameterIndex = 0;
-
             ConsoleKey key;
             string[] languages = { "fr", "en", "es", "de", "Cancel" };
-            string[] parameters = { "JSON", "XML" };
 
             do {
                 Console.Clear();
@@ -93,40 +87,6 @@ namespace easysave_project.Controllers {
             }
 
             ChangeLanguage(languages[languageIndex]);
-
-            do
-            {
-                Console.Clear();
-                Console.WriteLine(GetResource("SelectLogFormat"));
-
-                for (int i = 0; i < parameters.Length; i++)
-                {
-                    if (i == logParameterIndex)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine($" ➜ {parameters[i]}");
-                        Console.ResetColor();
-                    }
-                    else
-                    {
-                        Console.WriteLine($"   {parameters[i]}");
-                    }
-                }
-
-                key = Console.ReadKey(true).Key;
-
-                if (key == ConsoleKey.UpArrow && logParameterIndex > 0)
-                {
-                    logParameterIndex--;
-                }
-                else if (key == ConsoleKey.DownArrow && logParameterIndex < parameters.Length - 1)
-                {
-                    logParameterIndex++;
-                }
-
-            } while (key != ConsoleKey.Enter);
-
-            _currentFormat = parameters[logParameterIndex];
         }
 
         private void ChangeLanguage(string newLanguage, bool clear = true) {
