@@ -65,7 +65,7 @@ namespace easysave_project.Controllers {
             {
                 new MenuAction(_languageController.GetResource("Backup"), ExecuteBackup),
                 new MenuAction(_languageController.GetResource("Restore"), ExecuteRestore),
-                new MenuAction(_languageController.GetResource("ChangeLanguage"), _languageController.ShowLanguageMenu),
+                new MenuAction(_languageController.GetResource("ChangeLanguage"), _languageController.ShowParameterMenu),
                 new MenuAction(_languageController.GetResource("Exit"), () => IsRunning = false),
             };
         }
@@ -94,7 +94,6 @@ namespace easysave_project.Controllers {
                 stateService.AddFileToState(backupJobName, file, destFile, fileSizeInt);
                
                 Console.WriteLine($"📂 Transfert en cours : {fileName}");
-                File.Copy(file, destFile, true);
 
                 stateService.UpdateFileTransfer(backupJobName, file, fileSizeInt);
             }
@@ -137,8 +136,9 @@ namespace easysave_project.Controllers {
                     WaitForKeyPress();
                     stopwatch.Stop();
                     double elapsedTime = stopwatch.Elapsed.TotalSeconds;
-                    LogEntry logEntry = new LogEntry(nomSauvegarde, sourcePath, destinationPath, fileSize, elapsedTime);
-                    _logController.SaveLog(logEntry);
+                    LogEntry logEntry = new LogEntry();
+                    logEntry.SetLogEntry(nomSauvegarde, sourcePath, destinationPath, fileSize, elapsedTime);
+                    _logController.SaveLogXml(logEntry);
                     break;
 
                 default:
@@ -148,8 +148,9 @@ namespace easysave_project.Controllers {
                     WaitForKeyPress();
                     stopwatchCase2.Stop();
                     double elapsedTimeCase2 = stopwatchCase2.Elapsed.TotalSeconds;
-                    LogEntry logEntryCase2 = new LogEntry(nomSauvegarde, sourcePath, destinationPath, fileSize, elapsedTimeCase2);
-                    _logController.SaveLog(logEntryCase2);
+                    LogEntry logEntryCase2 = new LogEntry();
+                    logEntryCase2.SetLogEntry(nomSauvegarde, sourcePath, destinationPath, fileSize, elapsedTimeCase2);
+                    _logController.SaveLogXml(logEntryCase2);
                     break;
 
 
