@@ -6,7 +6,23 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid x:Name="ContentArea">
-        
+    <Grid Padding="20" RowDefinitions="Auto, Auto, Auto, Auto, Auto" ColumnDefinitions="Auto, *">
+
+        <!-- Nom de la sauvegarde à restaurer -->
+        <TextBlock Text="Nom de la sauvegarde à restaurer:" Margin="0,0,30,5"/>
+        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+            <TextBox x:Name="BackupNameTextBox" Width="200" Margin="0,0,0,5"/>
+        </StackPanel>
+
+        <!-- Choix du type de restauration -->
+        <TextBlock Text="Type de restauration:" Grid.Row="1" Margin="0,0,30,5"/>
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+            <RadioButton x:Name="CompleteRestoreRadioButton" Content="Complète" IsChecked="True" Margin="0,5,0,0"/>
+            <RadioButton x:Name="DifferentialRestoreRadioButton" Content="Différentielle" Margin="20,5,0,0"/>
+        </StackPanel>
+
+        <!-- Bouton de lancement de la restauration -->
+        <Button Grid.Row="2" Grid.Column="1" Content="Lancer la restauration" Click="StartRestore_Click" Margin="0,10,0,0"/>
+
     </Grid>
 </Page>

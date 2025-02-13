@@ -68,7 +68,7 @@ public sealed partial class BackupPage : Page
     // Lancer la sauvegarde
     private void StartBackup_Click(object sender, RoutedEventArgs e)
     {
-        var backupName = BackupNameTextBox?.Text;
+        var backupName = BackupNameTextBox?.Text ?? "";
         var sourcePath = SourcePathText?.Text;
         var destinationPath = DestinationPathText?.Text;
 

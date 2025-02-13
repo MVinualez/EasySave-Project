@@ -101,8 +101,17 @@ public partial class App : Application
     {
         base.OnLaunched(args);
 
-        App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));
+        //App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));
 
         await App.GetService<IActivationService>().ActivateAsync(args);
     }
+
+    public void RestartApp()
+    {
+        var process = new System.Diagnostics.Process();
+        process.StartInfo.FileName = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+        process.Start();
+        System.Diagnostics.Process.GetCurrentProcess().Kill();
+    }
+
 }

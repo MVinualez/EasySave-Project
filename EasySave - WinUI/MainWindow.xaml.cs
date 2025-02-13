@@ -1,5 +1,6 @@
 ﻿using EasySave___WinUI.Helpers;
-
+using Windows.Globalization;
+using Windows.Storage;
 using Windows.UI.ViewManagement;
 
 namespace EasySave___WinUI;
@@ -22,6 +23,13 @@ public sealed partial class MainWindow : WindowEx
         dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
         settings = new UISettings();
         settings.ColorValuesChanged += Settings_ColorValuesChanged; // cannot use FrameworkElement.ActualThemeChanged event
+
+        string savedLanguage = ApplicationData.Current.LocalSettings.Values["AppLanguage"] as string;
+        if (!string.IsNullOrEmpty(savedLanguage))
+        {
+            ApplicationLanguages.PrimaryLanguageOverride = savedLanguage;
+        }
+
     }
 
     // this handles updating the caption button colors correctly when indows system theme is changed
