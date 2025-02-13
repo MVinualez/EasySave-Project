@@ -9,7 +9,7 @@ namespace easysave_project.Services
 {
     internal class StateService(string stateFilePath)
     {
-        private readonly string _stateFilePath = stateFilePath;
+        private string _stateFilePath = stateFilePath;
 
         public void GetCurrentStateFile()
         {
@@ -19,6 +19,7 @@ namespace easysave_project.Services
             string dirName = "state";
             string fileName = "state.json";
             string fullPath = Path.Combine(path, dirName, fileName);
+            _stateFilePath = fullPath;
 
             if (!Directory.Exists(Path.Combine(path, dirName)))
             {

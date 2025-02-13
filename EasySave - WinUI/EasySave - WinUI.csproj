@@ -15,6 +15,7 @@
 	<EnableMsixTooling>true</EnableMsixTooling>
 	<DefaultLanguage>en-US</DefaultLanguage>
 	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="Assets\BadgeLogo.scale-100.png" />
