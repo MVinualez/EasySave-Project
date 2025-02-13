@@ -124,49 +124,49 @@
     <value>EasySave</value>
   </data>
   <data name="Shell_Backup.Content" xml:space="preserve">
-    <value>Sauvegarde</value>
+    <value>Respaldo</value>
   </data>
   <data name="Shell_Restore.Content" xml:space="preserve">
-    <value>Restauration</value>
+    <value>Restaurar</value>
   </data>
   <data name="Settings_Personalization.Text" xml:space="preserve">
-    <value>Personnalisation</value>
+    <value>Personalización</value>
   </data>
   <data name="Settings_Theme.Text" xml:space="preserve">
-    <value>Thème</value>
+    <value>Tema</value>
   </data>
   <data name="Settings_Theme_Light.Content" xml:space="preserve">
-    <value>Clair</value>
+    <value>Claro</value>
   </data>
   <data name="Settings_Theme_Dark.Content" xml:space="preserve">
-    <value>Sombre</value>
+    <value>Oscuro</value>
   </data>
   <data name="Settings_Theme_Default.Content" xml:space="preserve">
-    <value>Système</value>
+    <value>Sistema</value>
   </data>
   <data name="Settings_About.Text" xml:space="preserve">
-    <value>À propos de cette application</value>
+    <value>Acerca de esta aplicación</value>
   </data>
   <data name="Settings_AboutDescription.Text" xml:space="preserve">
-    <value>TODO : Remplacez par la description de votre application.</value>
+    <value>TODO: Reemplazar con la descripción de tu aplicación.</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.Content" xml:space="preserve">
-    <value>Déclaration de confidentialité</value>
+    <value>Política de privacidad</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.NavigateUri" xml:space="preserve">
-    <value>https://VotreUrlDeConfidentialiteIci/</value>
+    <value>https://TuUrlDePrivacidadAquí/</value>
   </data>
   <data name="AppNotificationSamplePayload" xml:space="preserve">
     <value>&lt;toast launch="action=ToastClick"&gt;
   &lt;visual&gt;
     &lt;binding template="ToastGeneric"&gt;
-      &lt;text&gt;Notification de l'application&lt;/text&gt;
+      &lt;text&gt;Notificación de la aplicación&lt;/text&gt;
       &lt;text&gt;&lt;/text&gt;
       &lt;image placement="appLogoOverride" hint-crop="circle" src="{0}Assets/WindowIcon.ico"/&gt;
     &lt;/binding&gt;
   &lt;/visual&gt;
   &lt;actions&gt;
-    &lt;action content="Paramètres" arguments="action=Settings"/&gt;
+    &lt;action content="Configuración" arguments="action=Settings"/&gt;
   &lt;/actions&gt;
 &lt;/toast&gt;</value>
   </data>

@@ -57,6 +57,7 @@
               Margin="{StaticResource XSmallTopMargin}">
                     <ComboBoxItem Tag="en-US">English</ComboBoxItem>
                     <ComboBoxItem Tag="fr-FR">Français</ComboBoxItem>
+                    <ComboBoxItem Tag="es-419">Español (Latinoamérica)</ComboBoxItem>
             </ComboBox>
 
 
