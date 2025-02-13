@@ -14,6 +14,7 @@ namespace EasySaveLibrary.Models
         public long FileSize { get; set; }
         public double FileTransferTime { get; set; }
         public string Time { get; set; }
+        private string FileType { get; set; }
         public LogEntry()
         {
             
@@ -27,6 +28,11 @@ namespace EasySaveLibrary.Models
             FileSize = fileSize;
             FileTransferTime = fileTransferTime;
             Time = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+        }
+
+        public void SetFileType(string fileType)
+        {
+            FileType = fileType;
         }
     }
 }

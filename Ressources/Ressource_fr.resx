@@ -127,7 +127,7 @@
     <value>Changement de langue annulé</value>
   </data>
   <data name="ChangeLanguage" xml:space="preserve">
-    <value>Changer la langue</value>
+    <value>Parametres</value>
   </data>
   <data name="Exit" xml:space="preserve">
     <value>Quitter</value>

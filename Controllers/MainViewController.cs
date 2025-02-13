@@ -11,6 +11,7 @@ namespace easysave_project.Controllers {
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        private string _currentFileFormat;
         private int _selectedIndex;
         private bool _isRunning = true;
         private List<MenuAction> _menuActions = new();
@@ -65,7 +66,7 @@ namespace easysave_project.Controllers {
             {
                 new MenuAction(_languageController.GetResource("Backup"), ExecuteBackup),
                 new MenuAction(_languageController.GetResource("Restore"), ExecuteRestore),
-                new MenuAction(_languageController.GetResource("ChangeLanguage"), _languageController.ShowParameterMenu),
+                new MenuAction(_languageController.GetResource("ChangeLanguage"), () => { _currentFileFormat = _languageController.ShowParameterMenu(); }),
                 new MenuAction(_languageController.GetResource("Exit"), () => IsRunning = false),
             };
         }
@@ -138,7 +139,14 @@ namespace easysave_project.Controllers {
                     double elapsedTime = stopwatch.Elapsed.TotalSeconds;
                     LogEntry logEntry = new LogEntry();
                     logEntry.SetLogEntry(nomSauvegarde, sourcePath, destinationPath, fileSize, elapsedTime);
-                    _logController.SaveLogXml(logEntry);
+                    if (_currentFileFormat == "XML")
+                    {
+                        _logController.SaveLogXml(logEntry);
+                    }
+                    else
+                    {
+                        _logController.SaveLogJson(logEntry);
+                    }
                     break;
 
                 default:
@@ -150,7 +158,14 @@ namespace easysave_project.Controllers {
                     double elapsedTimeCase2 = stopwatchCase2.Elapsed.TotalSeconds;
                     LogEntry logEntryCase2 = new LogEntry();
                     logEntryCase2.SetLogEntry(nomSauvegarde, sourcePath, destinationPath, fileSize, elapsedTimeCase2);
-                    _logController.SaveLogXml(logEntryCase2);
+                    if (_currentFileFormat == "XML")
+                    {
+                        _logController.SaveLogXml(logEntryCase2);
+                    }
+                    else
+                    {
+                        _logController.SaveLogJson(logEntryCase2);
+                    }
                     break;
 
 
