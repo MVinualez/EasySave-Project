@@ -1,0 +1,10 @@
+﻿{
+    "profiles": {
+      "EasySave - WinUI (Package)": {
+        "commandName": "MsixPackage"
+      },
+      "EasySave - WinUI (Unpackaged)": {
+        "commandName": "Project"
+      }
+    }
+}
