@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Resources;
 using static System.Net.Mime.MediaTypeNames;
 using System.Runtime.Intrinsics.X86;
+using EasySaveLibrary.Models;
 
 namespace easysave_project.Controllers {
     internal class LanguageController {
@@ -43,12 +44,12 @@ namespace easysave_project.Controllers {
 
         }
 
-        public void ShowParameterMenu() {
+        public string ShowParameterMenu() {
             int languageIndex = Array.IndexOf(new[] { "fr", "en", "es", "de" }, _currentLanguage);
             if (languageIndex == -1) languageIndex = 0;
 
-            string _currentFormat = "JSON";
-            int logParameterIndex = Array.IndexOf(new[] { "JSON", "XML" }, _currentFormat);
+            string _currentFileFormat = "JSON";
+            int logParameterIndex = Array.IndexOf(new[] { "JSON", "XML" }, _currentFileFormat);
             if (logParameterIndex == -1) logParameterIndex = 0;
 
             ConsoleKey key;
@@ -69,7 +70,7 @@ namespace easysave_project.Controllers {
                         Console.WriteLine($" ➜ {languages[i].ToUpper()}");
                         Console.ResetColor();
                     } else {
-                        Console.WriteLine($"   {languages[i].ToUpper()}");
+                        Console.WriteLine($"{languages[i].ToUpper()}");
                     }
                 }
 
@@ -89,7 +90,7 @@ namespace easysave_project.Controllers {
                 Console.WriteLine("❌ " + GetResource("CancelLanguageSelection"));
                 Console.ResetColor();
                 WaitForKeyPress();
-                return;
+                return "JSON";
             }
 
             ChangeLanguage(languages[languageIndex]);
@@ -97,7 +98,7 @@ namespace easysave_project.Controllers {
             do
             {
                 Console.Clear();
-                Console.WriteLine(GetResource("SelectLogFormat"));
+                Console.WriteLine("🛠️Select the Log file format");
 
                 for (int i = 0; i < parameters.Length; i++)
                 {
@@ -126,7 +127,9 @@ namespace easysave_project.Controllers {
 
             } while (key != ConsoleKey.Enter);
 
-            _currentFormat = parameters[logParameterIndex];
+            _currentFileFormat = parameters[logParameterIndex];
+            Console.WriteLine($"📜 Format de log sélectionné : {_currentFileFormat}");
+            return _currentFileFormat;
         }
 
         private void ChangeLanguage(string newLanguage, bool clear = true) {
