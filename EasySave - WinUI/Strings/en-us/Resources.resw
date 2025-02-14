@@ -197,4 +197,25 @@
   <data name="BackupPage_StartBackup.Content" xml:space="preserve">
     <value>Start Backup</value>
   </data>
+  <data name="BackupPage_FillAllFieldsError" xml:space="preserve">
+    <value>Please fill in all the fields before starting the backup.</value>
+  </data>
+  <data name="BackupPage_BackpError.Text" xml:space="preserve">
+    <value>An error has occurred during backup:</value>
+  </data>
+  <data name="BackupPage_SourceFolderDoesntExists" xml:space="preserve">
+    <value>⚠️ The source folder does not exist.</value>
+  </data>
+  <data name="BackupPage_BackupFinished" xml:space="preserve">
+    <value>🎉 Backup complete and status updated!</value>
+  </data>
+  <data name="BackupPage_BackupInProgress" xml:space="preserve">
+    <value>📂 Transfer in progress: {0}</value>
+  </data>
+  <data name="RestorePage_RestoreName.Text" xml:space="preserve">
+    <value>Name of the backup to restore:</value>
+  </data>
+  <data name="RestorePage_StartRestoration.Content" xml:space="preserve">
+    <value>Start restoration</value>
+  </data>
 </root>
