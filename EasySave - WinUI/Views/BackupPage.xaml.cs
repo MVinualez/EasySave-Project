@@ -16,7 +16,6 @@ namespace EasySave___WinUI.Views;
 
 public sealed partial class BackupPage : Page
 {
-
     private readonly BackupJobController _backupJobController;
     private readonly LogController _logController;
 
@@ -65,15 +64,19 @@ public sealed partial class BackupPage : Page
         }
     }
 
-    // Lancer la sauvegarde
-    private void StartBackup_Click(object sender, RoutedEventArgs e)
+    private async void StartBackup_Click(object sender, RoutedEventArgs e)
     {
+        // Check if Office apps are running before proceeding
+        bool canStart = await _backupJobController.CanStartBackup(this.XamlRoot);
+        if (!canStart)
+        {
+            ShowMessage("Backup canceled due to running Office applications.");
+            return;
+        }
+
         var backupName = BackupNameTextBox?.Text ?? "";
         var sourcePath = SourcePathText?.Text;
         var destinationPath = DestinationPathText?.Text;
-
-        DirectoryInfo di = new DirectoryInfo(sourcePath);
-        long fileSize = di.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(fi => fi.Length);
 
         if (string.IsNullOrWhiteSpace(backupName) || sourcePath == "Aucun dossier sélectionné" || destinationPath == "Aucun dossier sélectionné")
         {
@@ -85,30 +88,30 @@ public sealed partial class BackupPage : Page
         {
             stateCreator(backupName, sourcePath, destinationPath);
 
-            if(DifferentialBackupRadioButton.IsChecked == true)
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            if (DifferentialBackupRadioButton.IsChecked == true)
             {
-                Stopwatch stopwatch = Stopwatch.StartNew();
                 _backupJobController.StartDiffBackup(backupName, sourcePath, destinationPath, CompleteBackupRadioButton.IsChecked ?? true);
-                stopwatch.Stop();
-                double elapsedTime = stopwatch.Elapsed.TotalSeconds;
-                LogEntry logEntry = new LogEntry(backupName, sourcePath, destinationPath, fileSize, elapsedTime);
-                _logController.SaveLog(logEntry);
-            } else
-            {
-                Stopwatch stopwatchCase2 = Stopwatch.StartNew();
-                _backupJobController.StartBackup(backupName, sourcePath, destinationPath, CompleteBackupRadioButton.IsChecked ?? true);
-                stopwatchCase2.Stop();
-                double elapsedTimeCase2 = stopwatchCase2.Elapsed.TotalSeconds;
-                LogEntry logEntryCase2 = new LogEntry(backupName, sourcePath, destinationPath, fileSize, elapsedTimeCase2);
-                _logController.SaveLog(logEntryCase2);
             }
+            else
+            {
+                _backupJobController.StartBackup(backupName, sourcePath, destinationPath, CompleteBackupRadioButton.IsChecked ?? true);
+            }
+            stopwatch.Stop();
 
-            //ShowMessage($"Sauvegarde '{backupName}' effectuée avec succès !");
-        } catch (Exception ex)
+            double elapsedTime = stopwatch.Elapsed.TotalSeconds;
+            long fileSize = new DirectoryInfo(sourcePath).EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(fi => fi.Length);
+            LogEntry logEntry = new LogEntry(backupName, sourcePath, destinationPath, fileSize, elapsedTime);
+            _logController.SaveLog(logEntry);
+        }
+        catch (Exception ex)
         {
             ShowMessage($"Erreur lors de la sauvegarde : {ex.Message}");
         }
     }
+
+    // Lancer la sauvegarde
+  
 
     private void stateCreator(string backupName, string sourcePath, string destinationPath)
     {

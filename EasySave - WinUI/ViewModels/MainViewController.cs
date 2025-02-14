@@ -5,6 +5,7 @@ using easysave_project.Services;
 using System.Diagnostics;
 using EasySaveLibrary.Controllers;
 using EasySaveLibrary.Models;
+using EasySave___WinUI.Models;
 
 namespace easysave_project.Controllers {
     internal class MainViewController : INotifyPropertyChanged

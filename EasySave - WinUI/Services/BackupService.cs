@@ -6,6 +6,9 @@ using System.Xml.Linq;
 using System.Reflection;
 using EasySaveLibrary.Controllers;
 using EasySaveLibrary.Models;
+using System.Diagnostics;
+using EasySave___WinUI.Models;
+using Microsoft.UI.Xaml.Controls;
 
 namespace easysave_project.Services
 {
@@ -13,9 +16,11 @@ namespace easysave_project.Services
     {
         LogController logController = new LogController();
         LogEntry logEntry;
-        
+
+
         public void RunBackup(BackupJob job)
         {
+            
             string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName);
             path = path != null && path.Length >= 1 ? path : Directory.GetCurrentDirectory();
 
