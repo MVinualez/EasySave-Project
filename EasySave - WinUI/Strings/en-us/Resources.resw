@@ -170,4 +170,31 @@
   &lt;/actions&gt;
 &lt;/toast&gt;</value>
   </data>
+  <data name="BackupPage_BackupName.Text" xml:space="preserve">
+    <value>Backup Name</value>
+  </data>
+  <data name="BackupPage_SourceFolder.Text" xml:space="preserve">
+    <value>Source Folder</value>
+  </data>
+  <data name="BackupPage_DestinationFolder.Text" xml:space="preserve">
+    <value>Destination Folder</value>
+  </data>
+  <data name="BackupPage_BackupType.Text" xml:space="preserve">
+    <value>Backup Type</value>
+  </data>
+  <data name="BackupPage_Browse.Content" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+  <data name="BackupPage_NoFolderSelected.Text" xml:space="preserve">
+    <value>No Folder Selected</value>
+  </data>
+  <data name="BackupPage_CompleteBackup.Content" xml:space="preserve">
+    <value>Complete</value>
+  </data>
+  <data name="BackupPage_DifferentialBackup.Content" xml:space="preserve">
+    <value>Differential</value>
+  </data>
+  <data name="BackupPage_StartBackup.Content" xml:space="preserve">
+    <value>Start Backup</value>
+  </data>
 </root>

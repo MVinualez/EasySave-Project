@@ -4,39 +4,44 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:helpers="using:EasySave___WinUI.Helpers"
+    xmlns:xaml="using:Microsoft.UI.Xaml"
     mc:Ignorable="d">
+    <Page.Resources>
+        <helpers:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
+    </Page.Resources>
 
-    <Grid Padding="20" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto" ColumnDefinitions="Auto, *">
+    <Grid Padding="20" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto" ColumnDefinitions="Auto, *" x:Name="ContentArea">
 
         <!-- Nom de la sauvegarde -->
-        <TextBlock Text="Nom de la sauvegarde:" Margin="0,0,30,5"/>
+        <TextBlock x:Uid="BackupPage_BackupName" Margin="0,0,30,5"/>
         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
             <TextBox x:Name="BackupNameTextBox" Width="200" Margin="0,0,0,5"/>
         </StackPanel>
 
         <!-- Sélection dossier source -->
-        <TextBlock Text="Dossier source:" Grid.Row="1" Margin="0,0,30,5"/>
+        <TextBlock x:Uid="BackupPage_DestinationFolder" Grid.Row="1" Margin="0,0,30,5"/>
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
-            <Button Content="Parcourir" Click="SelectSourceFolder_Click" Margin="0,0,0,0"/>
-            <TextBlock x:Name="SourcePathText" Text="Aucun dossier sélectionné" VerticalAlignment="Center"/>
+            <Button x:Uid="BackupPage_Browse" Click="SelectSourceFolder_Click" Margin="0,0,0,0"/>
+            <TextBlock x:Name="SourcePathText" x:Uid="BackupPage_NoFolderSelected" VerticalAlignment="Center"/>
         </StackPanel>
 
         <!-- Sélection dossier destination -->
-        <TextBlock Text="Dossier destination:" Grid.Row="2" Margin="0,0,30,5"/>
+        <TextBlock x:Uid="BackupPage_SourceFolder" Grid.Row="2" Margin="0,0,30,5"/>
         <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
-            <Button Content="Parcourir" Click="SelectDestinationFolder_Click" Margin="0,0,0,0"/>
-            <TextBlock x:Name="DestinationPathText" Text="Aucun dossier sélectionné" VerticalAlignment="Center"/>
+            <Button x:Uid="BackupPage_Browse" Click="SelectDestinationFolder_Click" Margin="0,0,0,0"/>
+            <TextBlock x:Name="DestinationPathText" x:Uid="BackupPage_NoFolderSelected" VerticalAlignment="Center"/>
         </StackPanel>
 
         <!-- Choix du type de sauvegarde -->
-        <TextBlock Text="Type de sauvegarde:" Grid.Row="3" Margin="0,0,30,5"/>
+        <TextBlock x:Uid="BackupPage_BackupType" Grid.Row="3" Margin="0,0,30,5"/>
         <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
-            <RadioButton x:Name="CompleteBackupRadioButton" Content="Complète" IsChecked="True" Margin="0,5,0,0"/>
-            <RadioButton x:Name="DifferentialBackupRadioButton" Content="Différentielle" Margin="20,5,0,0"/>
+            <RadioButton x:Name="CompleteBackupRadioButton" x:Uid="BackupPage_CompleteBackup" IsChecked="True" Margin="0,5,0,0"/>
+            <RadioButton x:Name="DifferentialBackupRadioButton" x:Uid="BackupPage_DifferentialBackup" Margin="20,5,0,0"/>
         </StackPanel>
 
         <!-- Bouton de lancement de la sauvegarde -->
-        <Button Grid.Row="4" Grid.Column="1" Content="Lancer la sauvegarde" Click="StartBackup_Click" Margin="0,10,0,0"/>
+        <Button Grid.Row="4" x:Uid="BackupPage_StartBackup" Click="StartBackup_Click" Margin="0,10,0,0"/>
 
     </Grid>
 </Page>
