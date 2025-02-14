@@ -11,6 +11,7 @@ using EasySaveLibrary.Controllers;
 using System.Diagnostics;
 using Windows.UI.StartScreen;
 using EasySaveLibrary.Models;
+using Windows.ApplicationModel.Resources;
 
 namespace EasySave___WinUI.Views;
 
@@ -19,6 +20,8 @@ public sealed partial class BackupPage : Page
 
     private readonly BackupJobController _backupJobController;
     private readonly LogController _logController;
+    private readonly ResourceLoader _resourceLoader = new ResourceLoader();
+
 
     public BackupViewModel ViewModel
     {
@@ -35,7 +38,6 @@ public sealed partial class BackupPage : Page
         _logController = new LogController();
     }
 
-    // Sélection du dossier source
     private async void SelectSourceFolder_Click(object sender, RoutedEventArgs e)
     {
         var picker = new FolderPicker();
@@ -50,7 +52,6 @@ public sealed partial class BackupPage : Page
         }
     }
 
-    // Sélection du dossier destination
     private async void SelectDestinationFolder_Click(object sender, RoutedEventArgs e)
     {
         var picker = new FolderPicker();
@@ -65,7 +66,6 @@ public sealed partial class BackupPage : Page
         }
     }
 
-    // Lancer la sauvegarde
     private void StartBackup_Click(object sender, RoutedEventArgs e)
     {
         var backupName = BackupNameTextBox?.Text ?? "";
@@ -75,9 +75,10 @@ public sealed partial class BackupPage : Page
         DirectoryInfo di = new DirectoryInfo(sourcePath);
         long fileSize = di.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(fi => fi.Length);
 
-        if (string.IsNullOrWhiteSpace(backupName) || sourcePath == "Aucun dossier sélectionné" || destinationPath == "Aucun dossier sélectionné")
+        if (string.IsNullOrWhiteSpace(backupName) || sourcePath == _resourceLoader.GetString("BackupPage_NoFolderSelected") || destinationPath == _resourceLoader.GetString("BackupPage_NoFolderSelected"))
         {
-            ShowMessage("Veuillez remplir tous les champs avant de lancer la sauvegarde.");
+            string errorMessage = _resourceLoader.GetString("BackupPage_FillAllFieldsError");
+            ShowMessage(errorMessage);
             return;
         }
 
@@ -102,11 +103,9 @@ public sealed partial class BackupPage : Page
                 LogEntry logEntryCase2 = new LogEntry(backupName, sourcePath, destinationPath, fileSize, elapsedTimeCase2);
                 _logController.SaveLog(logEntryCase2);
             }
-
-            //ShowMessage($"Sauvegarde '{backupName}' effectuée avec succès !");
         } catch (Exception ex)
         {
-            ShowMessage($"Erreur lors de la sauvegarde : {ex.Message}");
+            ShowMessage($"{_resourceLoader.GetString("BackupPage_BackupError")} {ex.Message}");
         }
     }
 
@@ -119,7 +118,7 @@ public sealed partial class BackupPage : Page
         stateService.StartJob(backupName);
         if (!Directory.Exists(sourcePath))
         {
-            ShowMessage("⚠️ Le dossier source n'existe pas.");
+            ShowMessage(_resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"));
             return;
         }
         string[] files = Directory.GetFiles(sourcePath);
@@ -132,14 +131,13 @@ public sealed partial class BackupPage : Page
             int fileSizeInt = (int)fileSize;
 
             stateService.AddFileToState(backupName, file, destFile, fileSizeInt);
-            //ShowMessage($"📂 Transfert en cours : {fileName}");
+            ProgressTextBox.Text = String.Format(_resourceLoader.GetString("BackupPage_BackupFinished"), fileName);
             File.Copy(file, destFile, true);
 
             stateService.UpdateFileTransfer(backupName, file, fileSizeInt);
         }
         stateService.CompleteJob(backupName);
-
-        //ShowMessage("🎉 Sauvegarde terminée et état mis à jour !");
+        ProgressTextBox.Text = _resourceLoader.GetString("BackupPage_BackupFinished");
     }
 
     private async void ShowMessage(string message)

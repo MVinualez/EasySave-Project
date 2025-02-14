@@ -194,4 +194,28 @@
   <data name="BackupPage_StartBackup.Content" xml:space="preserve">
     <value>Lancer la sauvegarde</value>
   </data>
+  <data name="BackupPage_FillAllFieldsError" xml:space="preserve">
+    <value>Veuillez remplir tous les champs avant de lancer la sauvegarde.</value>
+  </data>
+  <data name="BackupPage_BackupError" xml:space="preserve">
+    <value>Une erreur s'est produite lors de la sauvegarde :</value>
+  </data>
+  <data name="BackupPage_SourceFolderDoesntExists" xml:space="preserve">
+    <value>⚠️ Le dossier source n'existe pas.</value>
+  </data>
+  <data name="BackupPage_BackupFinished" xml:space="preserve">
+    <value>🎉 Sauvegarde terminée et état mis à jour !</value>
+  </data>
+  <data name="BackupPage_BackupInProgress" xml:space="preserve">
+    <value>📂 Transfert en cours : {0}</value>
+  </data>
+  <data name="RestorePage_RestoreName.Text" xml:space="preserve">
+    <value>Nom de la sauvegarde à restaurer :</value>
+  </data>
+  <data name="RestorePage_StartRestoration.Content" xml:space="preserve">
+    <value>Lancer la restauration</value>
+  </data>
+  <data name="BackupPage_DifferentialBackup.Content" xml:space="preserve">
+    <value>Différentielle</value>
+  </data>
 </root>
