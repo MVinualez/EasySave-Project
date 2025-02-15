@@ -7,18 +7,26 @@ using System.Xml;
 using System.IO;
 using Newtonsoft.Json;
 using EasySaveLibrary.Models;
+using System.Reflection;
 
 namespace EasySaveLibrary.Controllers
 {
     public class LogController
     {
-        private readonly string logDirectory = "Logs"; // Log location, depending on where the .exe is executed
+        private string? path;
+
+        private readonly string logDirectory = "logs"; // Log location, depending on where the .exe is executed
+        public string fullPath { get; set; }
 
         public LogController()
         {
-            if (!Directory.Exists(logDirectory))
+            this.path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName);
+            this.path = path != null && path.Length >= 1 ? path : Directory.GetCurrentDirectory();
+
+            this.fullPath = Path.Combine(path, logDirectory);
+            if (!Directory.Exists(fullPath))
             {
-                Directory.CreateDirectory(logDirectory);
+                Directory.CreateDirectory(fullPath);
             }   
         }
         // LogController method of the LogController class, which uses the Exists method from the System.IO.Directory class 
@@ -27,7 +35,7 @@ namespace EasySaveLibrary.Controllers
         public void SaveLog(LogEntry log) // Creation of the SaveLog method, which calls the LogEntry method from /Models/LogEntry
         {
             string logFileName = $"{DateTime.Now:yyyy-MM-dd}.json"; 
-            string logFilePath = Path.Combine(logDirectory, logFileName);
+            string logFilePath = Path.Combine(fullPath, logFileName);
 
             List<LogEntry> logEntries = new List<LogEntry>();
 
