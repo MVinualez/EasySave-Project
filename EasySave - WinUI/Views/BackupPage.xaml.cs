@@ -107,7 +107,6 @@ public sealed partial class BackupPage : Page
             stopwatch.Stop();
 
             double elapsedTime = stopwatch.Elapsed.TotalSeconds;
-            long fileSize = new DirectoryInfo(sourcePath).EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(fi => fi.Length);
             LogEntry logEntry = new LogEntry(backupName, sourcePath, destinationPath, fileSize, elapsedTime);
             _logController.SaveLog(logEntry);
         }
