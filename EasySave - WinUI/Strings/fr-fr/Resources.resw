@@ -218,4 +218,7 @@
   <data name="BackupPage_DifferentialBackup.Content" xml:space="preserve">
     <value>Différentielle</value>
   </data>
+  <data name="BackupPage_EncryptionKey.Text" xml:space="preserve">
+    <value>Clef de chiffrement</value>
+  </data>
 </root>

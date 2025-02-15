@@ -53,7 +53,7 @@ namespace easysave_project.Controllers {
             _languageController.LanguageChanged += (sender, args) => InitializeMenuActions();
 
             InitializeMenuActions();
-            var backupService = new BackupService();
+            var backupService = new BackupService("");
             _backupJobController = new BackupJobController(backupService);
             _logController = new LogController();
 

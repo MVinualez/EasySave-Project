@@ -34,7 +34,13 @@
             <RadioButton x:Name="CompleteBackupRadioButton" x:Uid="BackupPage_CompleteBackup" IsChecked="True" Margin="0,5,0,0"/>
             <RadioButton x:Name="DifferentialBackupRadioButton" x:Uid="BackupPage_DifferentialBackup" Margin="20,5,0,0"/>
         </StackPanel>
-        <TextBlock x:Name="ProgressTextBox" Grid.Row="4" Grid.Column="1" Margin="0,0,30,5"/>
-        <Button Grid.Row="5" x:Uid="BackupPage_StartBackup" Click="StartBackup_Click" Margin="0,10,0,0"/>
+
+        <TextBlock x:Uid="BackupPage_EncryptionKey" Grid.Row="4" Margin="0,0,30,5"/>
+        <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+            <TextBox x:Name="BackupEncryptionKeyTextBox" Width="200" Margin="0,0,0,5"/>
+        </StackPanel>
+        
+        <TextBlock x:Name="ProgressTextBox" Grid.Row="5" Grid.Column="1" Margin="0,0,30,5"/>
+        <Button Grid.Row="6" x:Uid="BackupPage_StartBackup" Click="StartBackup_Click" Margin="0,10,0,0"/>
     </Grid>
 </Page>

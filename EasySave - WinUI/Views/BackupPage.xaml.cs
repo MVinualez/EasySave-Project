@@ -18,9 +18,10 @@ namespace EasySave___WinUI.Views;
 public sealed partial class BackupPage : Page
 {
 
-    private readonly BackupJobController _backupJobController;
+    private BackupJobController _backupJobController;
     private readonly LogController _logController;
     private readonly ResourceLoader _resourceLoader = new ResourceLoader();
+    private BackupService backupService;
 
 
     public BackupViewModel ViewModel
@@ -30,12 +31,10 @@ public sealed partial class BackupPage : Page
 
     public BackupPage()
     {
-        ViewModel = App.GetService<BackupViewModel>();
+        this.ViewModel = App.GetService<BackupViewModel>();
         InitializeComponent();
 
-        var backupService = new BackupService();
-        _backupJobController = new BackupJobController(backupService);
-        _logController = new LogController();
+        this._logController = new LogController();
     }
 
     private async void SelectSourceFolder_Click(object sender, RoutedEventArgs e)
@@ -68,6 +67,9 @@ public sealed partial class BackupPage : Page
 
     private void StartBackup_Click(object sender, RoutedEventArgs e)
     {
+        this.backupService = new BackupService(BackupEncryptionKeyTextBox.Text);
+        this._backupJobController = new BackupJobController(backupService);
+
         var backupName = BackupNameTextBox?.Text ?? "";
         var sourcePath = SourcePathText?.Text;
         var destinationPath = DestinationPathText?.Text;
@@ -131,8 +133,8 @@ public sealed partial class BackupPage : Page
             int fileSizeInt = (int)fileSize;
 
             stateService.AddFileToState(backupName, file, destFile, fileSizeInt);
-            ProgressTextBox.Text = String.Format(_resourceLoader.GetString("BackupPage_BackupFinished"), fileName);
-            File.Copy(file, destFile, true);
+            ProgressTextBox.Text = String.Format(_resourceLoader.GetString("BackupPage_BackupInProgress"), fileName);
+            //File.Copy(file, destFile, true);
 
             stateService.UpdateFileTransfer(backupName, file, fileSizeInt);
         }

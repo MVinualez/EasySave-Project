@@ -218,4 +218,7 @@
   <data name="RestorePage_StartRestoration.Content" xml:space="preserve">
     <value>Start restoration</value>
   </data>
+  <data name="BackupPage_EncryptionKey.Text" xml:space="preserve">
+    <value>Encryption Key</value>
+  </data>
 </root>
