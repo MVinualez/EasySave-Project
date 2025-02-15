@@ -6,6 +6,9 @@ using System.Xml.Linq;
 using System.Reflection;
 using EasySaveLibrary.Controllers;
 using EasySaveLibrary.Models;
+using System.Diagnostics;
+using EasySave___WinUI.Models;
+using Microsoft.UI.Xaml.Controls;
 using easysave_project.CryptoSoft;
 using System.Security.Cryptography;
 
