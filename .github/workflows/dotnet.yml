@@ -2,9 +2,9 @@ name: Build & Publish .NET App
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "develop", "DLL" ]
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "develop", "DLL" ]
 
 jobs:
   build:
