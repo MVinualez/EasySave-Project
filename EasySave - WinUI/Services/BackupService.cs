@@ -11,15 +11,20 @@ using EasySave___WinUI.Models;
 using Microsoft.UI.Xaml.Controls;
 using easysave_project.CryptoSoft;
 using System.Security.Cryptography;
+using System.Runtime.CompilerServices;
 
 namespace easysave_project.Services {
     internal class BackupService {
-        LogController logController = new LogController();
-        LogEntry logEntry;
         public string encryptionKey { get; set; }
+        private static BackupService _instanceBackupService;
 
-        public BackupService(string key) {
-            encryptionKey = key;
+        public static BackupService getInstanceBackupService()
+        {
+            if (_instanceBackupService == null)
+            {               
+               _instanceBackupService = new BackupService();
+            }
+            return _instanceBackupService;
         }
 
         public void RunBackup(BackupJob job) {

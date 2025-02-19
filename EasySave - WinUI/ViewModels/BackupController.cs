@@ -11,12 +11,6 @@ namespace easysave_project.Controllers
         private readonly BackupService _backupService;
 
         private readonly ProcessChecker _processChecker = new ProcessChecker();
-
-        private void StartBackup()
-        {
-            // Your existing backup logic here
-        }
-
         public async Task<bool> ShowOfficeWarningDialog(XamlRoot xamlRoot)
         {
             var dialog = new ContentDialog

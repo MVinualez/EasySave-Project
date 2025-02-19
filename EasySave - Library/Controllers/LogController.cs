@@ -13,12 +13,13 @@ namespace EasySaveLibrary.Controllers
 {
     public class LogController
     {
+        private static LogController _LogController;
         private string? path;
 
         private readonly string logDirectory = "logs"; // Log location, depending on where the .exe is executed
         public string fullPath { get; set; }
 
-        public LogController()
+        private LogController()
         {
             this.path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName);
             this.path = path != null && path.Length >= 1 ? path : Directory.GetCurrentDirectory();
@@ -28,6 +29,16 @@ namespace EasySaveLibrary.Controllers
             {
                 Directory.CreateDirectory(fullPath);
             }   
+        }
+
+        public static LogController GetInstanceLogController()
+        {
+            if (_LogController == null)
+            {
+                _LogController = new LogController();
+            }
+            
+            return _LogController;
         }
         // LogController method of the LogController class, which uses the Exists method from the System.IO.Directory class 
         // and takes the logDirectory variable as a parameter
