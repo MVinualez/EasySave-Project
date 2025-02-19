@@ -22,18 +22,11 @@ public sealed partial class BackupPage : Page
     private readonly ResourceLoader _resourceLoader = new ResourceLoader();
     private BackupService backupService;
 
-
-    public BackupViewModel ViewModel
-    {
-        get;
-    }
-
     public BackupPage()
     {
-        this.ViewModel = App.GetService<BackupViewModel>();
         InitializeComponent();
 
-        this._logController = new LogController();
+        this._logController = LogController.GetInstanceLogController();
     }
 
     private async void SelectSourceFolder_Click(object sender, RoutedEventArgs e)
@@ -66,7 +59,8 @@ public sealed partial class BackupPage : Page
 
     private async void StartBackup_Click(object sender, RoutedEventArgs e)
     {
-        this.backupService = new BackupService(BackupEncryptionKeyTextBox.Text);
+        BackupService backupService = BackupService.getInstanceBackupService();
+        backupService.encryptionKey = BackupEncryptionKeyTextBox.Text;
         this._backupJobController = new BackupJobController(backupService);
 
         // Check if Office apps are running before proceeding
