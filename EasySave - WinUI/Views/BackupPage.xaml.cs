@@ -101,7 +101,7 @@ public sealed partial class BackupPage : Page
             stopwatch.Stop();
 
             double elapsedTime = stopwatch.Elapsed.TotalSeconds;
-            LogEntry logEntry = new LogEntry(backupName, sourcePath, destinationPath, fileSize, elapsedTime);
+            LogEntryModel logEntry = new LogEntryModel(backupName, sourcePath, destinationPath, fileSize, elapsedTime);
             _logController.SaveLog(logEntry);
         }
         catch (Exception ex)
