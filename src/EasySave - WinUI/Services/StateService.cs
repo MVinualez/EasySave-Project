@@ -11,8 +11,7 @@ namespace easysave_project.Services
     {
         private string _stateFilePath = stateFilePath;
 
-        public void GetCurrentStateFile()
-        {
+        public void GetCurrentStateFile() {
             string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName);
             path = path != null && path.Length >= 1 ? path : Directory.GetCurrentDirectory();
 
@@ -31,8 +30,7 @@ namespace easysave_project.Services
             }
         }
 
-        private Dictionary<string, StateModel> LoadState()
-        {
+        private Dictionary<string, StateModel> LoadState() {
             if (File.Exists(_stateFilePath))
             {
                 string json = File.ReadAllText(_stateFilePath);
@@ -44,8 +42,7 @@ namespace easysave_project.Services
             return new();
         }
 
-        private void SaveState(Dictionary<string, StateModel> states)
-        {
+        private void SaveState(Dictionary<string, StateModel> states) {
             string json = JsonConvert.SerializeObject(states, Formatting.Indented);
             File.WriteAllText(_stateFilePath, json);
             Console.WriteLine($"État mis à jour : {_stateFilePath}");
@@ -74,8 +71,7 @@ namespace easysave_project.Services
             }
         }
 
-        public void AddFileToState(string jobName, string sourceFilePath, string targetFilePath, int fileSize)
-        {
+        public void AddFileToState(string jobName, string sourceFilePath, string targetFilePath, int fileSize) {
             Dictionary<string, StateModel> states = LoadState();
 
             if (!states.ContainsKey(jobName))
@@ -100,8 +96,7 @@ namespace easysave_project.Services
             Console.WriteLine($"Ajout du fichier {sourceFilePath} au job {jobName}.");
         }
 
-        public void UpdateFileTransfer(string jobName, string sourceFilePath, int fileSize)
-        {
+        public void UpdateFileTransfer(string jobName, string sourceFilePath, int fileSize) {
             Dictionary<string, StateModel> states = LoadState();
 
             if (!states.ContainsKey(jobName))
@@ -134,8 +129,7 @@ namespace easysave_project.Services
             }
         }
 
-        public void CompleteJob(string jobName)
-        {
+        public void CompleteJob(string jobName) {
             Dictionary<string, StateModel> states = LoadState();
 
             if (!states.ContainsKey(jobName))
