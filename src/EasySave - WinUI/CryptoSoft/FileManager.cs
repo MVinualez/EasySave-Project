@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
-using easysave_project.Models;
+using EasySave___WinUI.Models;
 using System.Text;
 
-namespace easysave_project.CryptoSoft;
+namespace EasySave___WinUI.CryptoSoft;
 
 /// <summary>
 /// File manager class

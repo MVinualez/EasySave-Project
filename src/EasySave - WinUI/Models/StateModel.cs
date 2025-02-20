@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System.IO;
 
-namespace easysave_project.Models {
+namespace EasySave___WinUI.Models {
     internal class StateModel {
         private string _jobName = string.Empty;
         private int _timestamp;
