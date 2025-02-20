@@ -1,4 +1,4 @@
-namespace easysave_project.Models
+namespace EasySave___WinUI.Models
 {
     internal class BackupJob
     {
