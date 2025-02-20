@@ -18,7 +18,7 @@ namespace EasySave___WinUI.Views;
 public sealed partial class BackupPage : Page
 {
     private BackupJobController _backupJobController;
-    private readonly LogController _logController;
+    private readonly LogService _logController;
     private readonly ResourceLoader _resourceLoader = new ResourceLoader();
     private BackupService backupService;
 
@@ -26,7 +26,7 @@ public sealed partial class BackupPage : Page
     {
         InitializeComponent();
 
-        this._logController = LogController.GetInstanceLogController();
+        this._logController = LogService.GetInstanceLogController();
     }
 
     private async void SelectSourceFolder_Click(object sender, RoutedEventArgs e)
@@ -101,7 +101,7 @@ public sealed partial class BackupPage : Page
             stopwatch.Stop();
 
             double elapsedTime = stopwatch.Elapsed.TotalSeconds;
-            LogEntry logEntry = new LogEntry(backupName, sourcePath, destinationPath, fileSize, elapsedTime);
+            LogEntryModel logEntry = new LogEntryModel(backupName, sourcePath, destinationPath, fileSize, elapsedTime);
             _logController.SaveLog(logEntry);
         }
         catch (Exception ex)
