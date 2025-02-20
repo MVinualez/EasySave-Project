@@ -6,28 +6,10 @@
         private string _sourceFilePathInProgress = string.Empty;
         private string _targetFilePathInProgress = string.Empty;
 
-
-        // ------ Getters / Setters ------
-        public int FilesRemaining {
-            get { return _filesRemaining; }
-            set { _filesRemaining = value; }
-        }
-
-        public int FileSizeRemaining {
-            get { return _fileSizeRemaining; }
-            set { _fileSizeRemaining = value; }
-        }
-
-        public string SourceFilePathInProgress {
-            get { return _sourceFilePathInProgress; }
-            set { _sourceFilePathInProgress = value; }
-        }
-
-        public string TargetFilePathInProgress {
-            get { return _targetFilePathInProgress; }
-            set { _targetFilePathInProgress = value; }
-        }
-        // -------------------------------
+        public int FilesRemaining { get; set; }
+        public int FilesSizeRemaining { get; set; }
+        public string SourceFilePathInProgress { get; set; }
+        public string TargetFilePathInProgress { get; set; }
 
         public StateProgressModel(
             int filesRemaining,
@@ -36,7 +18,7 @@
             string targetFilePathInProgress
         ) {
             FilesRemaining = filesRemaining;
-            FileSizeRemaining = fileSizeRemaining;
+            FilesSizeRemaining = fileSizeRemaining;
             SourceFilePathInProgress = sourceFilePathInProgress;
             TargetFilePathInProgress = targetFilePathInProgress;
         }
