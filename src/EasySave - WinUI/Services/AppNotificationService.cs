@@ -2,7 +2,6 @@
 using System.Web;
 
 using EasySave___WinUI.Contracts.Services;
-using EasySave___WinUI.ViewModels;
 
 using Microsoft.Windows.AppNotifications;
 

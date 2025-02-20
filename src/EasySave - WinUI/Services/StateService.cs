@@ -1,18 +1,22 @@
-﻿using easysave_project.Models;
+﻿using EasySave___WinUI.Models;
+using EasySave___WinUI.ViewModels;
+using Microsoft.UI.Xaml;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
+using Windows.ApplicationModel.Resources;
 
-namespace easysave_project.Services
-{
-    internal class StateService(string stateFilePath)
-    {
-        private string _stateFilePath = stateFilePath;
+namespace EasySave___WinUI.Services {
+    internal class StateService {
+        private static StateService? _instance;
+        private string _stateFilePath = string.Empty;
+        private readonly XamlRoot _xamlRoot;
+        private readonly NotificationViewModel _notificationViewModel = NotificationViewModel.GetNotificationViewModelInstance();
+        private readonly ResourceLoader _resourceLoader;
 
-        public void GetCurrentStateFile()
-        {
+        private StateService(XamlRoot xamlRoot) {
+            _resourceLoader = new ResourceLoader();
+
+            _xamlRoot = xamlRoot;
             string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName);
             path = path != null && path.Length >= 1 ? path : Directory.GetCurrentDirectory();
 
@@ -21,42 +25,38 @@ namespace easysave_project.Services
             string fullPath = Path.Combine(path, dirName, fileName);
             _stateFilePath = fullPath;
 
-            if (!Directory.Exists(Path.Combine(path, dirName)))
-            {
+            if (!Directory.Exists(Path.Combine(path, dirName))) {
                 Directory.CreateDirectory(Path.Combine(path, dirName));
             }
-            if (!File.Exists(fullPath))
-            {
+            if (!File.Exists(fullPath)) {
                 File.WriteAllText(fullPath, "{}");
             }
         }
 
-        private Dictionary<string, StateModel> LoadState()
-        {
-            if (File.Exists(_stateFilePath))
-            {
+        public static StateService GetStateServiceInstance(XamlRoot xamlRoot) {
+            _instance ??= new StateService(xamlRoot);
+            return _instance;
+        }
+
+        private Dictionary<string, StateModel> LoadState() {
+            if (File.Exists(_stateFilePath)) {
                 string json = File.ReadAllText(_stateFilePath);
-                if (!string.IsNullOrWhiteSpace(json))
-                {
+                if (!string.IsNullOrWhiteSpace(json)) {
                     return JsonConvert.DeserializeObject<Dictionary<string, StateModel>>(json) ?? new();
                 }
             }
             return new();
         }
 
-        private void SaveState(Dictionary<string, StateModel> states)
-        {
+        private void SaveState(Dictionary<string, StateModel> states) {
             string json = JsonConvert.SerializeObject(states, Formatting.Indented);
             File.WriteAllText(_stateFilePath, json);
-            Console.WriteLine($"État mis à jour : {_stateFilePath}");
         }
 
-        public void StartJob(string jobName)
-        {
+        public void StartJob(string jobName) {
             Dictionary<string, StateModel> states = LoadState();
 
-            if (!states.ContainsKey(jobName))
-            {
+            if (!states.ContainsKey(jobName)) {
                 states[jobName] = new StateModel(
                     jobName: jobName,
                     timestamp: (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
@@ -66,21 +66,16 @@ namespace easysave_project.Services
                     progress: new StateProgressModel(0, 0, "", "")
                 );
                 SaveState(states);
-                Console.WriteLine($"Job {jobName} démarré.");
-            }
-            else
-            {
-                Console.WriteLine($"Le job {jobName} existe déjà.");
+            } else {
+                _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_TaskAlreadyExists"), string.Format(_resourceLoader.GetString("State_TaskAlreadyExistsContent"), jobName), string.Empty, "OK", _xamlRoot);
             }
         }
 
-        public void AddFileToState(string jobName, string sourceFilePath, string targetFilePath, int fileSize)
-        {
+        public void AddFileToState(string jobName, string sourceFilePath, string targetFilePath, int fileSize) {
             Dictionary<string, StateModel> states = LoadState();
 
-            if (!states.ContainsKey(jobName))
-            {
-                Console.WriteLine($"Le job {jobName} n'existe pas. Utilisez StartJob() d'abord.");
+            if (!states.ContainsKey(jobName)) {
+                _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_JobDoesntExists"), string.Format(_resourceLoader.GetString("State_JobDoesntExistsContent"), jobName), string.Empty, "OK", _xamlRoot);
                 return;
             }
 
@@ -97,23 +92,20 @@ namespace easysave_project.Services
 
             states[jobName] = state;
             SaveState(states);
-            Console.WriteLine($"Ajout du fichier {sourceFilePath} au job {jobName}.");
+            _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_FileAdded"), string.Format(_resourceLoader.GetString("State_FileAdded"), sourceFilePath, jobName), string.Empty, "OK", _xamlRoot);
         }
 
-        public void UpdateFileTransfer(string jobName, string sourceFilePath, int fileSize)
-        {
+        public void UpdateFileTransfer(string jobName, string sourceFilePath, int fileSize) {
             Dictionary<string, StateModel> states = LoadState();
 
-            if (!states.ContainsKey(jobName))
-            {
-                Console.WriteLine($"Le job {jobName} n'existe pas.");
+            if (!states.ContainsKey(jobName)) {
+                _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_JobDoesntExists"), string.Format(_resourceLoader.GetString("State_JobDoesntExistsContent"), jobName), string.Empty, "OK", _xamlRoot);
                 return;
             }
 
             StateModel state = states[jobName];
 
-            if (state.NumberOfFilesRemaining > 0)
-            {
+            if (state.NumberOfFilesRemaining > 0) {
                 state.NumberOfFilesRemaining--;
                 state.Timestamp = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
                 state.TotalFilesSize -= fileSize;
@@ -126,36 +118,29 @@ namespace easysave_project.Services
 
                 states[jobName] = state;
                 SaveState(states);
-                Console.WriteLine($"Transfert en cours : {sourceFilePath} ({fileSize} octets)");
-            }
-            else
-            {
-                Console.WriteLine($"Aucun fichier en attente pour {jobName}.");
+                _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_FileTransferInProgress"), string.Format(_resourceLoader.GetString("State_FileTransferInProgress"), sourceFilePath, fileSize), string.Empty, "OK", _xamlRoot);
+            } else {
+                _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_NoPendingFiles"), string.Format(_resourceLoader.GetString("State_NoPendingFiles"), jobName), string.Empty, "OK", _xamlRoot);
             }
         }
 
-        public void CompleteJob(string jobName)
-        {
+        public void CompleteJob(string jobName) {
             Dictionary<string, StateModel> states = LoadState();
 
-            if (!states.ContainsKey(jobName))
-            {
-                Console.WriteLine($"Le job {jobName} n'existe pas.");
+            if (!states.ContainsKey(jobName)) {
+                _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_JobDoesntExists"), string.Format(_resourceLoader.GetString("State_JobDoesntExistsContent"), jobName), string.Empty, "OK", _xamlRoot);
                 return;
             }
 
             StateModel state = states[jobName];
 
-            if (state.NumberOfFilesRemaining == 0)
-            {
+            if (state.NumberOfFilesRemaining == 0) {
                 state.State = "Completed";
                 states[jobName] = state;
                 SaveState(states);
-                Console.WriteLine($"Job {jobName} terminé avec succès !");
-            }
-            else
-            {
-                Console.WriteLine($"Le job {jobName} n'est pas encore terminé. Fichiers restants : {state.NumberOfFilesRemaining}");
+                _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_JobCompleted"), string.Format(_resourceLoader.GetString("State_JobCompleted"), jobName), string.Empty, "OK", _xamlRoot);
+            } else {
+                _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_JobNotFinished"), string.Format(_resourceLoader.GetString("State_JobNotFinished"), jobName, state.NumberOfFilesRemaining), string.Empty, "OK", _xamlRoot);
             }
         }
     }
