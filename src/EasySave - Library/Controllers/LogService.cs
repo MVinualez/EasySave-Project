@@ -11,15 +11,14 @@ using System.Reflection;
 
 namespace EasySaveLibrary.Controllers
 {
-    public class LogController
+    public class LogService
     {
-        private static LogController _LogController;
+        private static LogService _LogService;
         private string? path;
-
         private readonly string logDirectory = "logs"; // Log location, depending on where the .exe is executed
         public string fullPath { get; set; }
 
-        private LogController()
+        private LogService()
         {
             this.path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName);
             this.path = path != null && path.Length >= 1 ? path : Directory.GetCurrentDirectory();
@@ -28,33 +27,34 @@ namespace EasySaveLibrary.Controllers
             if (!Directory.Exists(fullPath))
             {
                 Directory.CreateDirectory(fullPath);
-            }   
+            }
         }
 
-        public static LogController GetInstanceLogController()
+        public static LogService GetInstanceLogController()
         {
-            if (_LogController == null)
+            if (_LogService == null)
             {
-                _LogController = new LogController();
+                _LogService = new LogService();
             }
-            
-            return _LogController;
+
+            return _LogService;
         }
         // LogController method of the LogController class, which uses the Exists method from the System.IO.Directory class 
         // and takes the logDirectory variable as a parameter
         // Checks if the Logs folder exists, and creates it if not.
-        public void SaveLog(LogEntry log) // Creation of the SaveLog method, which calls the LogEntry method from /Models/LogEntry
+        public void SaveLog(string name, string fileSource, string fileTarget, long fileSize, double fileTransferTime) // Creation of the SaveLog method, which calls the LogEntry method from /Models/LogEntry
         {
-            string logFileName = $"{DateTime.Now:yyyy-MM-dd}.json"; 
+            LogEntryModel log = new LogEntryModel(name, fileSource, fileTarget, fileSize, fileTransferTime);
+            string logFileName = $"{DateTime.Now:yyyy-MM-dd}.json";
             string logFilePath = Path.Combine(fullPath, logFileName);
 
-            List<LogEntry> logEntries = new List<LogEntry>();
+            List<LogEntryModel> logEntries = new List<LogEntryModel>();
 
             // Load existing log if there is already one
             if (File.Exists(logFilePath))
             {
                 string existingJson = File.ReadAllText(logFilePath);
-                logEntries = JsonConvert.DeserializeObject<List<LogEntry>>(existingJson) ?? new List<LogEntry>();
+                logEntries = JsonConvert.DeserializeObject<List<LogEntryModel>>(existingJson) ?? new List<LogEntryModel>();
             }
 
             // Add the new entry and save
