@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EasySaveLibrary.Models
 {
-    public class LogEntry
+    public class LogEntryModel
     {
         public string Name { get; set; }
         public string FileSource { get; set; }
@@ -14,7 +14,7 @@ namespace EasySaveLibrary.Models
         public long FileSize { get; set; }
         public double FileTransferTime { get; set; }
         public string Time { get; set; }
-        public LogEntry(string name, string fileSource, string fileTarget, long fileSize, double fileTransferTime)
+        public LogEntryModel(string name, string fileSource, string fileTarget, long fileSize, double fileTransferTime)
         {
             Name = name;
             FileSource = fileSource;
@@ -24,4 +24,5 @@ namespace EasySaveLibrary.Models
             Time = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
         }
     }
+
 }
