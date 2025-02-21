@@ -1,25 +1,19 @@
-﻿using easysave_project.Models;
-using easysave_project.Controllers;
-using System;
-using System.IO;
-using System.Xml.Linq;
+﻿using EasySave___WinUI.Models;
 using System.Reflection;
-using EasySaveLibrary.Controllers;
-using EasySaveLibrary.Models;
-using System.Diagnostics;
-using EasySave___WinUI.Models;
-using Microsoft.UI.Xaml.Controls;
-using easysave_project.CryptoSoft;
-using System.Security.Cryptography;
+using EasySave___WinUI.CryptoSoft;
 
-namespace easysave_project.Services {
+namespace EasySave___WinUI.Services {
     internal class BackupService {
-        LogController logController = new LogController();
-        LogEntry logEntry;
         public string encryptionKey { get; set; }
+        private static BackupService _instanceBackupService;
 
-        public BackupService(string key) {
-            encryptionKey = key;
+        public static BackupService getInstanceBackupService()
+        {
+            if (_instanceBackupService == null)
+            {               
+               _instanceBackupService = new BackupService();
+            }
+            return _instanceBackupService;
         }
 
         public void RunBackup(BackupJob job) {

@@ -1,7 +1,13 @@
-﻿namespace easysave_project.Models {
+﻿namespace EasySave___WinUI.Models {
     internal class StateProgressModel {
+
+        private int _filesRemaining;
+        private int _fileSizeRemaining;
+        private string _sourceFilePathInProgress = string.Empty;
+        private string _targetFilePathInProgress = string.Empty;
+
         public int FilesRemaining { get; set; }
-        public int FileSizeRemaining { get; set; }
+        public int FilesSizeRemaining { get; set; }
         public string SourceFilePathInProgress { get; set; }
         public string TargetFilePathInProgress { get; set; }
 
@@ -12,7 +18,7 @@
             string targetFilePathInProgress
         ) {
             FilesRemaining = filesRemaining;
-            FileSizeRemaining = fileSizeRemaining;
+            FilesSizeRemaining = fileSizeRemaining;
             SourceFilePathInProgress = sourceFilePathInProgress;
             TargetFilePathInProgress = targetFilePathInProgress;
         }

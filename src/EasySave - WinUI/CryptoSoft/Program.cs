@@ -1,5 +1,5 @@
-﻿//namespace easysave_project.CryptoSoft;
-//using easysave_project.Models;
+﻿//namespace EasySave___WinUI.CryptoSoft;
+//using EasySave___WinUI.Models;
 
 //public static class Program
 //{

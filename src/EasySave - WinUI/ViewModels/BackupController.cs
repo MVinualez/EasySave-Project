@@ -1,22 +1,14 @@
 ﻿using EasySave___WinUI.Models;
-using easysave_project.Models;
-using easysave_project.Services;
+using EasySave___WinUI.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-namespace easysave_project.Controllers
-{
+namespace EasySave___WinUI.Controllers {
     internal class BackupJobController
     {
         private readonly BackupService _backupService;
 
         private readonly ProcessChecker _processChecker = new ProcessChecker();
-
-        private void StartBackup()
-        {
-            // Your existing backup logic here
-        }
-
         public async Task<bool> ShowOfficeWarningDialog(XamlRoot xamlRoot)
         {
             var dialog = new ContentDialog

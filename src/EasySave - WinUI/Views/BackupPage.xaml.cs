@@ -1,17 +1,15 @@
-﻿using EasySave___WinUI.ViewModels;
-
-using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls;
 using Windows.Storage.Pickers;
 using Windows.Storage;
 using WinRT.Interop;
 using Microsoft.UI.Xaml;
-using easysave_project.Services;
-using easysave_project.Controllers;
+using EasySave___WinUI.Services;
+using EasySave___WinUI.Controllers;
 using EasySaveLibrary.Controllers;
 using System.Diagnostics;
-using Windows.UI.StartScreen;
 using EasySaveLibrary.Models;
 using Windows.ApplicationModel.Resources;
+using EasySave___WinUI.ViewModels;
 
 namespace EasySave___WinUI.Views;
 
@@ -19,21 +17,18 @@ public sealed partial class BackupPage : Page
 {
     private BackupJobController _backupJobController;
     private readonly LogController _logController;
-    private readonly ResourceLoader _resourceLoader = new ResourceLoader();
-    private BackupService backupService;
-
-
-    public BackupViewModel ViewModel
-    {
-        get;
-    }
+    private readonly ResourceLoader _resourceLoader;
+    private readonly NotificationViewModel _notificationViewModel;
+    private readonly StateViewModel _stateViewModel;
 
     public BackupPage()
     {
-        this.ViewModel = App.GetService<BackupViewModel>();
         InitializeComponent();
 
-        this._logController = new LogController();
+        _resourceLoader = new ResourceLoader();
+        _notificationViewModel = NotificationViewModel.GetNotificationViewModelInstance();
+        _stateViewModel = StateViewModel.GetStateViewModelInstance(this.XamlRoot);
+        this._logController = LogController.GetInstanceLogController();
     }
 
     private async void SelectSourceFolder_Click(object sender, RoutedEventArgs e)
@@ -66,14 +61,15 @@ public sealed partial class BackupPage : Page
 
     private async void StartBackup_Click(object sender, RoutedEventArgs e)
     {
-        this.backupService = new BackupService(BackupEncryptionKeyTextBox.Text);
+        BackupService backupService = BackupService.getInstanceBackupService();
+        backupService.encryptionKey = BackupEncryptionKeyTextBox.Text;
         this._backupJobController = new BackupJobController(backupService);
 
         // Check if Office apps are running before proceeding
         bool canStart = await _backupJobController.CanStartBackup(this.XamlRoot);
         if (!canStart)
         {
-            ShowMessage("Backup canceled due to running Office applications.");
+            await _notificationViewModel.ShowPopupDialog(_resourceLoader.GetString("Backup_OfficeCanceled"), _resourceLoader.GetString("Backup_OfficeCanceled"), String.Empty, "OK", this.XamlRoot);
             return;
         }
 
@@ -86,8 +82,7 @@ public sealed partial class BackupPage : Page
 
         if (string.IsNullOrWhiteSpace(backupName) || sourcePath == _resourceLoader.GetString("BackupPage_NoFolderSelected") || destinationPath == _resourceLoader.GetString("BackupPage_NoFolderSelected"))
         {
-            string errorMessage = _resourceLoader.GetString("BackupPage_FillAllFieldsError");
-            ShowMessage(errorMessage);
+            await _notificationViewModel.ShowPopupDialog(_resourceLoader.GetString("BackupPage_FillAllFieldsError"), _resourceLoader.GetString("BackupPage_FillAllFieldsError"), String.Empty, "OK", this.XamlRoot);
             return;
         }
 
@@ -112,23 +107,19 @@ public sealed partial class BackupPage : Page
         }
         catch (Exception ex)
         {
-            ShowMessage($"{_resourceLoader.GetString("BackupPage_BackupError")} {ex.Message}");
+            await _notificationViewModel.ShowPopupDialog($"{_resourceLoader.GetString("BackupPage_BackupError")} {ex.Message}", $"{_resourceLoader.GetString("BackupPage_BackupError")} {ex.Message}", String.Empty, "OK", this.XamlRoot);
         }
     }
 
     // Lancer la sauvegarde
   
 
-    private void stateCreator(string backupName, string sourcePath, string destinationPath)
+    private async void stateCreator(string backupName, string sourcePath, string destinationPath)
     {
-        StateService stateService = new StateService("state/state.json");
-
-        stateService.GetCurrentStateFile();
-
-        stateService.StartJob(backupName);
+        _stateViewModel.RegisterJobState(backupName);
         if (!Directory.Exists(sourcePath))
         {
-            ShowMessage(_resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"));
+            await _notificationViewModel.ShowPopupDialog(_resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"), _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"), String.Empty, "OK", this.XamlRoot);
             return;
         }
         string[] files = Directory.GetFiles(sourcePath);
@@ -140,26 +131,13 @@ public sealed partial class BackupPage : Page
             long fileSize = new FileInfo(file).Length;
             int fileSizeInt = (int)fileSize;
 
-            stateService.AddFileToState(backupName, file, destFile, fileSizeInt);
+            _stateViewModel.TrackFileInState(backupName, file, destFile, fileSizeInt);
             ProgressTextBox.Text = String.Format(_resourceLoader.GetString("BackupPage_BackupInProgress"), fileName);
             //File.Copy(file, destFile, true);
 
-            stateService.UpdateFileTransfer(backupName, file, fileSizeInt);
+            _stateViewModel.MarkFileAsProcessed(backupName, file, fileSizeInt);
         }
-        stateService.CompleteJob(backupName);
+        _stateViewModel.CompleteJobState(backupName);
         ProgressTextBox.Text = _resourceLoader.GetString("BackupPage_BackupFinished");
-    }
-
-    private async void ShowMessage(string message)
-    {
-        ContentDialog dialog = new ContentDialog
-        {
-            Title = "Information",
-            Content = message,
-            CloseButtonText = "OK",
-            XamlRoot = this.XamlRoot
-        };
-
-        await dialog.ShowAsync();
     }
 }
