@@ -9,11 +9,11 @@ using Newtonsoft.Json;
 using EasySaveLibrary.Models;
 using System.Reflection;
 
-namespace EasySaveLibrary.Controllers
+namespace EasySaveLibrary.Services
 {
     public class LogService
     {
-        private static LogService _LogService;
+        private static LogService? _instance;
         private string? path;
         private readonly string logDirectory = "logs"; // Log location, depending on where the .exe is executed
         public string fullPath { get; set; }
@@ -30,14 +30,10 @@ namespace EasySaveLibrary.Controllers
             }
         }
 
-        public static LogService GetInstanceLogController()
+        public static LogService GetLogServiceInstance()
         {
-            if (_LogService == null)
-            {
-                _LogService = new LogService();
-            }
-
-            return _LogService;
+            _instance ??= new LogService();
+            return _instance;
         }
         // LogController method of the LogController class, which uses the Exists method from the System.IO.Directory class 
         // and takes the logDirectory variable as a parameter
