@@ -9,6 +9,7 @@ using Windows.ApplicationModel.Resources;
 using Microsoft.UI.Xaml.Controls;
 using EasySave___WinUI.CryptoSoft;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace EasySave___WinUI.Services {
     public abstract class BackupService {
@@ -37,8 +38,9 @@ namespace EasySave___WinUI.Services {
         }
 
 
-        public void RunBackup(string name, string source, string destination, bool isFullBackup, TextBlock textBlock) {
-            Task.Run(async () => {
+        public async Task<double> RunBackup(string name, string source, string destination, bool isFullBackup, TextBlock textBlock) {
+            return await Task.Run(async () => {
+                Stopwatch stopwatch = Stopwatch.StartNew();
                 BackupJob job = new BackupJob(name, source, destination, isFullBackup);
 
                 string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName);
@@ -58,7 +60,7 @@ namespace EasySave___WinUI.Services {
                             _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
                             _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
                             string.Empty, "OK", XamlRoot);
-                        return;
+                        return 0; // Retourne 0 si la source n'existe pas
                     }
 
                     await CopyDirectoryReccursively(job.Name, job.Source, job.Destination, job.IsFullBackup, textBlock);
@@ -75,6 +77,9 @@ namespace EasySave___WinUI.Services {
                 } catch (Exception ex) {
                     Console.WriteLine($"❌ Erreur : {ex.Message}");
                 }
+
+                stopwatch.Stop();
+                return stopwatch.Elapsed.TotalSeconds; // Retourne le temps écoulé
             });
         }
 
