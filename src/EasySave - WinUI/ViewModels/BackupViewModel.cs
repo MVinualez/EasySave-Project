@@ -56,7 +56,7 @@ public partial class BackupViewModel : ObservableRecipient {
         return true; // Aucune application Office en cours, on peut continuer
     }
 
-    public async void StartBackup(string name, string source, string destination, bool isFullBackup, string backupEncryptionKey, TextBlock textBlock) {
+    public async Task StartBackup(string name, string source, string destination, bool isFullBackup, string backupEncryptionKey, TextBlock textBlock) {
 
         // Récupération de l'instance de service de sauvegarde appropriée
         var backupService = GetBackupServiceInstance(isFullBackup);

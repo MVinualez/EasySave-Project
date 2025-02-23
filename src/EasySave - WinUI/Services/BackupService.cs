@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml.Controls;
 using EasySave___WinUI.CryptoSoft;
 using System.Reflection;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace EasySave___WinUI.Services {
     public abstract class BackupService {
@@ -20,7 +21,6 @@ namespace EasySave___WinUI.Services {
         private readonly ResourceLoader _resourceLoader;
 
         public XamlRoot XamlRoot { get; }
-
         public string EncryptionKey { get; set; }
 
         protected BackupService(XamlRoot xamlRoot) {
@@ -37,53 +37,67 @@ namespace EasySave___WinUI.Services {
             return _processChecker.IsOfficeAppRunning();
         }
 
-
         public async Task<double> RunBackup(string name, string source, string destination, bool isFullBackup, TextBlock textBlock) {
-            return await Task.Run(async () => {
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                BackupJob job = new BackupJob(name, source, destination, isFullBackup);
-
-                string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName);
-                path = path != null && path.Length >= 1 ? path : Directory.GetCurrentDirectory();
-
-                string dirName = "Backup";
-                string fullPathBackup = Path.Combine(path, dirName);
-                if (!Directory.Exists(fullPathBackup)) {
-                    Directory.CreateDirectory(fullPathBackup);
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            try {
+                if (!Directory.Exists(source)) {
+                    await _notificationViewModel.ShowPopupDialog(
+                        _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
+                        _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
+                        string.Empty, "OK", XamlRoot);
+                    return 0;
                 }
 
                 _stateViewModel.RegisterJobState(name);
 
-                try {
-                    if (!Directory.Exists(job.Source)) {
-                        await _notificationViewModel.ShowPopupDialog(
-                            _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
-                            _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
-                            string.Empty, "OK", XamlRoot);
-                        return 0; // Retourne 0 si la source n'existe pas
-                    }
+                string fullPathBackup = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Backup");
+                Directory.CreateDirectory(fullPathBackup);
 
-                    await CopyDirectoryReccursively(job.Name, job.Source, job.Destination, job.IsFullBackup, textBlock);
-                    await CopyDirectoryReccursively(job.Name, job.Source, fullPathBackup, job.IsFullBackup, textBlock);
+                await CopyDirectoryReccursively(name, source, destination, isFullBackup, textBlock);
+                await CopyDirectoryReccursively(name, source, fullPathBackup, isFullBackup, textBlock);
 
-                    var fileManager = new FileManager(job.Destination, [".docx", ".txt"], EncryptionKey);
-                    fileManager.Transform();
-                    _stateViewModel.CompleteJobState(name);
+                var fileManager = new FileManager(destination, [".docx", ".txt"], EncryptionKey);
+                fileManager.Transform();
+                _stateViewModel.CompleteJobState(name);
 
-                    textBlock.DispatcherQueue.TryEnqueue(() => {
-                        textBlock.Text = _resourceLoader.GetString("BackupPage_BackupFinished");
-                    });
+                textBlock.DispatcherQueue.TryEnqueue(() => {
+                    textBlock.Text = _resourceLoader.GetString("BackupPage_BackupFinished");
+                });
 
-                } catch (Exception ex) {
-                    Console.WriteLine($"❌ Erreur : {ex.Message}");
-                }
+            } catch (Exception ex) {
+                Console.WriteLine($"❌ Erreur : {ex.Message}");
+            }
 
-                stopwatch.Stop();
-                return stopwatch.Elapsed.TotalSeconds; // Retourne le temps écoulé
-            });
+            stopwatch.Stop();
+            return stopwatch.Elapsed.TotalSeconds;
         }
 
+        public async Task CopyDirectoryReccursively(string name, string source, string target, bool isFullBackup, TextBlock textBlock) {
+            foreach (string dir in Directory.GetDirectories(source, "*", SearchOption.AllDirectories)) {
+                string targetSubDir = dir.Replace(source, target);
+                Directory.CreateDirectory(targetSubDir);
+            }
 
-        public abstract Task CopyDirectoryReccursively(string name, string source, string target, bool isFullBackup, TextBlock textBlock);
+            foreach (string file in Directory.GetFiles(source, "*.*", SearchOption.AllDirectories)) {
+                string fileName = Path.GetFileName(file);
+                string destFile = Path.Combine(target, fileName);
+                long fileSize = new FileInfo(file).Length;
+
+                await Task.Run(() => {
+                    if (ShouldCopyFile(file, destFile)) {
+                        textBlock.DispatcherQueue.TryEnqueue(() => {
+                            textBlock.Text = string.Format(_resourceLoader.GetString("BackupPage_BackupInProgress"), fileName);
+                        });
+
+                        _stateViewModel.TrackFileInState(name, file, destFile, fileSize);
+                        File.Copy(file, destFile, true);
+                        _stateViewModel.MarkFileAsProcessed(name, file, fileSize);
+                    }
+                });
+            }
+        }
+
+        protected abstract bool ShouldCopyFile(string sourceFile, string destFile);
+
     }
 }
