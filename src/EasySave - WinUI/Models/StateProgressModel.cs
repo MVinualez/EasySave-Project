@@ -2,18 +2,18 @@
     internal class StateProgressModel {
 
         private int _filesRemaining;
-        private int _fileSizeRemaining;
+        private long _fileSizeRemaining;
         private string _sourceFilePathInProgress = string.Empty;
         private string _targetFilePathInProgress = string.Empty;
 
         public int FilesRemaining { get; set; }
-        public int FilesSizeRemaining { get; set; }
+        public long FilesSizeRemaining { get; set; }
         public string SourceFilePathInProgress { get; set; }
         public string TargetFilePathInProgress { get; set; }
 
         public StateProgressModel(
             int filesRemaining,
-            int fileSizeRemaining,
+            long fileSizeRemaining,
             string sourceFilePathInProgress,
             string targetFilePathInProgress
         ) {

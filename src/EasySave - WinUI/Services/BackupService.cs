@@ -34,34 +34,28 @@ namespace EasySave___WinUI.Services {
             return _processChecker.IsOfficeAppRunning();
         }
 
-        public async void StateCreator(string backupName, string sourcePath, string destinationPath, Action<string> onProgressUpdate) {
-            _stateViewModel.RegisterJobState(backupName);
-            if (!Directory.Exists(sourcePath)) {
-                await _notificationViewModel.ShowPopupDialog(
-                    _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
-                    _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
-                    string.Empty, "OK", XamlRoot);
-                return;
+        public void CopyDirectoryReccursively(string name, string source, string target, bool isFullBackup, Action<string> onProgressUpdate) {
+            foreach (string dir in Directory.GetDirectories(source, "*", SearchOption.AllDirectories)) {
+                string targetSubDir = dir.Replace(source, target);
+                Directory.CreateDirectory(targetSubDir);
             }
 
-            string[] files = Directory.GetFiles(sourcePath);
-            foreach (var file in files) {
+            foreach (string file in Directory.GetFiles(source, "*.*", SearchOption.AllDirectories)) {
                 string fileName = Path.GetFileName(file);
-                string destFile = Path.Combine(destinationPath, fileName);
+                string destFile = file.Replace(source, target);
                 long fileSize = new FileInfo(file).Length;
-                int fileSizeInt = (int)fileSize;
 
-                _stateViewModel.TrackFileInState(backupName, file, destFile, fileSizeInt);
-
-                // Notification de progression via callback
                 onProgressUpdate?.Invoke(string.Format(_resourceLoader.GetString("BackupPage_BackupInProgress"), fileName));
 
-                _stateViewModel.MarkFileAsProcessed(backupName, file, fileSizeInt);
+                _stateViewModel.TrackFileInState(name, file, destFile, fileSize);
+
+                File.Copy(file, destFile, true);
+
+                _stateViewModel.MarkFileAsProcessed(name, file, fileSize);
             }
-            _stateViewModel.CompleteJobState(backupName);
         }
 
-        public abstract void RunBackup(string name, string source, string target, bool isFullBackup);
-        public abstract void CopyDirectoryReccursively(string name, string source, string target, bool isFullBackup);
+        public abstract void RunBackup(string name, string source, string target, bool isFullBackup, Action<string> onProgressUpdate);
+        //public abstract void CopyDirectoryReccursively(string name, string source, string target, bool isFullBackup, Action<string> onProgressUpdate);
     }
 }

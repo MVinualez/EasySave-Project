@@ -94,10 +94,12 @@ public sealed partial class BackupPage : Page
         long fileSize = di.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(fi => fi.Length);
 
         try {
-            stateCreator(backupName, sourcePath, destinationPath);
-
             Stopwatch stopwatch = Stopwatch.StartNew();
-            _backupViewModel.StartBackup(backupName, sourcePath, destinationPath, isFullBackup);
+            _backupViewModel.StartBackup(backupName, sourcePath, destinationPath, isFullBackup, (progressText) => {
+                ProgressTextBox.DispatcherQueue.TryEnqueue(() => {
+                    ProgressTextBox.Text += progressText;
+                });
+            });
             stopwatch.Stop();
 
             double elapsedTime = stopwatch.Elapsed.TotalSeconds;
@@ -109,33 +111,5 @@ public sealed partial class BackupPage : Page
                 $"{_resourceLoader.GetString("BackupPage_BackupError")} {ex.Message}",
                 String.Empty, "OK", this.XamlRoot);
         }
-    }
-
-
-    private async void stateCreator(string backupName, string sourcePath, string destinationPath)
-    {
-        _stateViewModel.RegisterJobState(backupName);
-        if (!Directory.Exists(sourcePath))
-        {
-            await _notificationViewModel.ShowPopupDialog(_resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"), _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"), String.Empty, "OK", this.XamlRoot);
-            return;
-        }
-        string[] files = Directory.GetFiles(sourcePath);
-
-        foreach (var file in files)
-        {
-            string fileName = Path.GetFileName(file);
-            string destFile = Path.Combine(destinationPath, fileName);
-            long fileSize = new FileInfo(file).Length;
-            int fileSizeInt = (int)fileSize;
-
-            _stateViewModel.TrackFileInState(backupName, file, destFile, fileSizeInt);
-            ProgressTextBox.Text = String.Format(_resourceLoader.GetString("BackupPage_BackupInProgress"), fileName);
-            //File.Copy(file, destFile, true);
-
-            _stateViewModel.MarkFileAsProcessed(backupName, file, fileSizeInt);
-        }
-        _stateViewModel.CompleteJobState(backupName);
-        ProgressTextBox.Text = _resourceLoader.GetString("BackupPage_BackupFinished");
     }
 }
