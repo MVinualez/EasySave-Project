@@ -48,7 +48,7 @@ public partial class BackupViewModel : ObservableRecipient {
         return true; // Aucune application Office en cours, on peut continuer
     }
 
-    public void StartBackup(string name, string source, string destination, bool isFullBackup, Action<string> onProgressUpdate) {
-        GetBackupServiceInstance(isFullBackup).RunBackup(name, source, destination, isFullBackup, onProgressUpdate);
+    public void StartBackup(string name, string source, string destination, bool isFullBackup, TextBlock textBlock) {
+        GetBackupServiceInstance(isFullBackup).RunBackup(name, source, destination, isFullBackup, textBlock);
     }
 }

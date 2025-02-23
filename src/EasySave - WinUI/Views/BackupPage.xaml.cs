@@ -95,11 +95,7 @@ public sealed partial class BackupPage : Page
 
         try {
             Stopwatch stopwatch = Stopwatch.StartNew();
-            _backupViewModel.StartBackup(backupName, sourcePath, destinationPath, isFullBackup, (progressText) => {
-                ProgressTextBox.DispatcherQueue.TryEnqueue(() => {
-                    ProgressTextBox.Text += progressText;
-                });
-            });
+            backupService.RunBackup(backupName, sourcePath, destinationPath, isFullBackup, ProgressTextBox);
             stopwatch.Stop();
 
             double elapsedTime = stopwatch.Elapsed.TotalSeconds;

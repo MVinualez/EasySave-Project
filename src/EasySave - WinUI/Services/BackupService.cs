@@ -7,6 +7,8 @@ using Microsoft.UI.Xaml;
 using EasySave___WinUI.ViewModels;
 using Windows.ApplicationModel.Resources;
 using Microsoft.UI.Xaml.Controls;
+using EasySave___WinUI.CryptoSoft;
+using System.Reflection;
 
 namespace EasySave___WinUI.Services {
     public abstract class BackupService {
@@ -34,28 +36,49 @@ namespace EasySave___WinUI.Services {
             return _processChecker.IsOfficeAppRunning();
         }
 
-        public void CopyDirectoryReccursively(string name, string source, string target, bool isFullBackup, Action<string> onProgressUpdate) {
-            foreach (string dir in Directory.GetDirectories(source, "*", SearchOption.AllDirectories)) {
-                string targetSubDir = dir.Replace(source, target);
-                Directory.CreateDirectory(targetSubDir);
-            }
 
-            foreach (string file in Directory.GetFiles(source, "*.*", SearchOption.AllDirectories)) {
-                string fileName = Path.GetFileName(file);
-                string destFile = file.Replace(source, target);
-                long fileSize = new FileInfo(file).Length;
+        public void RunBackup(string name, string source, string destination, bool isFullBackup, TextBlock textBlock) {
+            Task.Run(async () => {
+                BackupJob job = new BackupJob(name, source, destination, isFullBackup);
 
-                onProgressUpdate?.Invoke(string.Format(_resourceLoader.GetString("BackupPage_BackupInProgress"), fileName));
+                string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName);
+                path = path != null && path.Length >= 1 ? path : Directory.GetCurrentDirectory();
 
-                _stateViewModel.TrackFileInState(name, file, destFile, fileSize);
+                string dirName = "Backup";
+                string fullPathBackup = Path.Combine(path, dirName);
+                if (!Directory.Exists(fullPathBackup)) {
+                    Directory.CreateDirectory(fullPathBackup);
+                }
 
-                File.Copy(file, destFile, true);
+                _stateViewModel.RegisterJobState(name);
 
-                _stateViewModel.MarkFileAsProcessed(name, file, fileSize);
-            }
+                try {
+                    if (!Directory.Exists(job.Source)) {
+                        await _notificationViewModel.ShowPopupDialog(
+                            _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
+                            _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
+                            string.Empty, "OK", XamlRoot);
+                        return;
+                    }
+
+                    await CopyDirectoryReccursively(job.Name, job.Source, job.Destination, job.IsFullBackup, textBlock);
+                    await CopyDirectoryReccursively(job.Name, job.Source, fullPathBackup, job.IsFullBackup, textBlock);
+
+                    var fileManager = new FileManager(job.Destination, [".docx", ".txt"], EncryptionKey);
+                    fileManager.Transform();
+                    _stateViewModel.CompleteJobState(name);
+
+                    textBlock.DispatcherQueue.TryEnqueue(() => {
+                        textBlock.Text = _resourceLoader.GetString("BackupPage_BackupFinished");
+                    });
+
+                } catch (Exception ex) {
+                    Console.WriteLine($"❌ Erreur : {ex.Message}");
+                }
+            });
         }
 
-        public abstract void RunBackup(string name, string source, string target, bool isFullBackup, Action<string> onProgressUpdate);
-        //public abstract void CopyDirectoryReccursively(string name, string source, string target, bool isFullBackup, Action<string> onProgressUpdate);
+
+        public abstract Task CopyDirectoryReccursively(string name, string source, string target, bool isFullBackup, TextBlock textBlock);
     }
 }

@@ -105,6 +105,8 @@ public class FileManager
         {
             if(keyBytes.Count != 0) {
                 result[i] = (byte)(fileBytes[i] ^ keyBytes[i % keyBytes.Count]);
+            } else {
+                result[i] = fileBytes[i];
             }
         }
         return result;
