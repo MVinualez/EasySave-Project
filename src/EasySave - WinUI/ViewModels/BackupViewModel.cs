@@ -44,16 +44,7 @@ public partial class BackupViewModel : ObservableRecipient {
     public async Task<bool> CanStartBackup(bool isFullBackup) {
         BackupService backupService = GetBackupServiceInstance(isFullBackup);
 
-        while (backupService.CanStartBackup()) {
-            bool retry = await _notificationViewModel.ShowPopupDialog(
-                "Microsoft Office Application Detected",
-                "A Microsoft Office application is running. Please close it before starting the backup.",
-                "Cancel", "Check Again", _xamlRoot
-            );
-
-            if (!retry) return false; // L'utilisateur annule la sauvegarde
-        }
-        return true; // Aucune application Office en cours, on peut continuer
+        return await backupService.CanStartBackup();
     }
 
     public async Task StartBackup(string name, string source, string destination, bool isFullBackup, string backupEncryptionKey, TextBlock textBlock) {

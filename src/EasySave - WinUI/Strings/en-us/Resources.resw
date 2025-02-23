@@ -236,4 +236,10 @@
   <data name="Backup_OfficeCanceled" xml:space="preserve">
     <value>Backup canceled due to running Office applications.</value>
   </data>
+  <data name="BackupPage_BackupPaused" xml:space="preserve">
+    <value>🕰️ Backup Paused...</value>
+  </data>
+  <data name="BackupPage_BackupResumed" xml:space="preserve">
+    <value>⏰ Backup Resumed</value>
+  </data>
 </root>

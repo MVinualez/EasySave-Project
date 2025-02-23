@@ -1,6 +1,7 @@
 ﻿using EasySaveLibrary.Services;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using EasySaveLibrary.ViewModels;
 using EasySave___WinUI.Models;
 using Microsoft.UI.Xaml;
@@ -10,7 +11,6 @@ using Microsoft.UI.Xaml.Controls;
 using EasySave___WinUI.CryptoSoft;
 using System.Reflection;
 using System.Diagnostics;
-using System.Threading.Tasks;
 
 namespace EasySave___WinUI.Services {
     public abstract class BackupService {
@@ -33,8 +33,25 @@ namespace EasySave___WinUI.Services {
             _resourceLoader = new ResourceLoader();
         }
 
-        public bool CanStartBackup() {
-            return _processChecker.IsOfficeAppRunning();
+        public async Task<bool> CanStartBackup() {
+            return !_processChecker.IsOfficeAppRunning(); // Retourne false si Word est ouvert
+        }
+
+        /// <summary>
+        /// Attend que Word ou une application bloquante soit fermée avant de continuer la sauvegarde.
+        /// </summary>
+        private async Task WaitForProcessToClose(TextBlock textBlock) {
+            while (!await CanStartBackup()) {
+                textBlock.DispatcherQueue.TryEnqueue(() => {
+                    textBlock.Text = _resourceLoader.GetString("BackupPage_BackupPaused");
+                });
+
+                await Task.Delay(2000); // Vérifie toutes les 2 secondes si Word est fermé
+            }
+
+            textBlock.DispatcherQueue.TryEnqueue(() => {
+                textBlock.Text = _resourceLoader.GetString("BackupPage_BackupResumed");
+            });
         }
 
         public async Task<double> RunBackup(string name, string source, string destination, bool isFullBackup, TextBlock textBlock) {
@@ -83,6 +100,8 @@ namespace EasySave___WinUI.Services {
                 string destFile = Path.Combine(target, fileName);
                 long fileSize = new FileInfo(file).Length;
 
+                await WaitForProcessToClose(textBlock); // Attendre que Word soit fermé avant de copier
+
                 await Task.Run(() => {
                     if (ShouldCopyFile(file, destFile)) {
                         textBlock.DispatcherQueue.TryEnqueue(() => {
@@ -98,6 +117,5 @@ namespace EasySave___WinUI.Services {
         }
 
         protected abstract bool ShouldCopyFile(string sourceFile, string destFile);
-
     }
 }
