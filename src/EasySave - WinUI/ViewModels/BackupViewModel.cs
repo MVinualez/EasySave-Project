@@ -48,7 +48,7 @@ public partial class BackupViewModel : ObservableRecipient {
             bool retry = await _notificationViewModel.ShowPopupDialog(
                 "Microsoft Office Application Detected",
                 "A Microsoft Office application is running. Please close it before starting the backup.",
-                "Check Again", "Cancel", _xamlRoot
+                "Cancel", "Check Again", _xamlRoot
             );
 
             if (!retry) return false; // L'utilisateur annule la sauvegarde

@@ -14,13 +14,10 @@ namespace EasySave___WinUI.Views;
 
 public sealed partial class BackupPage : Page
 {
-    private readonly BackupViewModel _backupViewModel;
 
     public BackupPage()
     {
         InitializeComponent();
-        
-        _backupViewModel = BackupViewModel.GetBackupViewModelInstance(this.XamlRoot);
     }
 
     private async void SelectSourceFolder_Click(object sender, RoutedEventArgs e)
@@ -51,7 +48,10 @@ public sealed partial class BackupPage : Page
         }
     }
 
+
     private async void StartBackup_Click(object sender, RoutedEventArgs e) {
+        BackupViewModel backupViewModel = BackupViewModel.GetBackupViewModelInstance(this.XamlRoot);
+
         bool isFullBackup = CompleteBackupRadioButton.IsChecked ?? true;
 
         var backupName = BackupNameTextBox?.Text ?? "";
@@ -59,6 +59,6 @@ public sealed partial class BackupPage : Page
         var destinationPath = DestinationPathText?.Text;
         var encryptionKey = BackupEncryptionKeyTextBox?.Text;
 
-        _backupViewModel.StartBackup(backupName, sourcePath, destinationPath, isFullBackup, encryptionKey, ProgressTextBox);
+        backupViewModel.StartBackup(backupName, sourcePath, destinationPath, isFullBackup, encryptionKey, ProgressTextBox);
     }
 }
