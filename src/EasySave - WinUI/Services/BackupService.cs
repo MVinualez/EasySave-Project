@@ -5,20 +5,19 @@ using System.Threading.Tasks;
 using EasySaveLibrary.ViewModels;
 using EasySave___WinUI.Models;
 using Microsoft.UI.Xaml;
-using EasySave___WinUI.ViewModels;
 using Windows.ApplicationModel.Resources;
 using Microsoft.UI.Xaml.Controls;
 using EasySave___WinUI.CryptoSoft;
-using System.Reflection;
 using System.Diagnostics;
+using EasySave___WinUI.ViewModels;
 
 namespace EasySave___WinUI.Services {
     public abstract class BackupService {
-        private readonly LogEntryViewModel _logEntryViewModel;
-        private readonly ProcessChecker _processChecker;
         private readonly StateViewModel _stateViewModel;
         private readonly NotificationViewModel _notificationViewModel;
         private readonly ResourceLoader _resourceLoader;
+        private volatile bool _isPaused = false;
+        private volatile bool _isStopped = false;
 
         public XamlRoot XamlRoot { get; }
         public string EncryptionKey { get; set; }
@@ -26,27 +25,33 @@ namespace EasySave___WinUI.Services {
         protected BackupService(XamlRoot xamlRoot) {
             XamlRoot = xamlRoot;
             EncryptionKey = string.Empty;
-            _logEntryViewModel = LogEntryViewModel.GetLogEntryViewModelInstance();
             _stateViewModel = StateViewModel.GetStateViewModelInstance(XamlRoot);
             _notificationViewModel = NotificationViewModel.GetNotificationViewModelInstance();
-            _processChecker = new ProcessChecker();
             _resourceLoader = new ResourceLoader();
         }
 
-        public async Task<bool> CanStartBackup() {
-            return !_processChecker.IsOfficeAppRunning(); // Retourne false si Word est ouvert
+        public void PauseBackup() {
+            _isPaused = true;
         }
 
-        /// <summary>
-        /// Attend que Word ou une application bloquante soit fermée avant de continuer la sauvegarde.
-        /// </summary>
+        public void ResumeBackup() {
+            _isPaused = false;
+        }
+
+        public void StopBackup() {
+            _isStopped = true;
+        }
+
+        public async Task<bool> CanStartBackup() {
+            return !new ProcessChecker().IsOfficeAppRunning();
+        }
+
         private async Task WaitForProcessToClose(TextBlock textBlock) {
             while (!await CanStartBackup()) {
                 textBlock.DispatcherQueue.TryEnqueue(() => {
                     textBlock.Text = _resourceLoader.GetString("BackupPage_BackupPaused");
                 });
-
-                await Task.Delay(2000); // Vérifie toutes les 2 secondes si Word est fermé
+                await Task.Delay(2000);
             }
 
             textBlock.DispatcherQueue.TryEnqueue(() => {
@@ -66,7 +71,6 @@ namespace EasySave___WinUI.Services {
                 }
 
                 _stateViewModel.RegisterJobState(name);
-
                 string fullPathBackup = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Backup");
                 Directory.CreateDirectory(fullPathBackup);
 
@@ -100,7 +104,13 @@ namespace EasySave___WinUI.Services {
                 string destFile = Path.Combine(target, fileName);
                 long fileSize = new FileInfo(file).Length;
 
-                await WaitForProcessToClose(textBlock); // Attendre que Word soit fermé avant de copier
+                await WaitForProcessToClose(textBlock);
+
+                while (_isPaused) {
+                    await Task.Delay(500);
+                }
+
+                if (_isStopped) return;
 
                 await Task.Run(() => {
                     if (ShouldCopyFile(file, destFile)) {

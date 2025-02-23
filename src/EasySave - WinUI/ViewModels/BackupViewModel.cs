@@ -5,86 +5,76 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 using System.Threading.Tasks;
 using EasySaveLibrary.Models;
-using System.Diagnostics;
 using Windows.ApplicationModel.Resources;
 using EasySaveLibrary.ViewModels;
 
-namespace EasySave___WinUI.ViewModels;
+namespace EasySave___WinUI.ViewModels {
 
-public partial class BackupViewModel : ObservableRecipient {
-    private static BackupViewModel? _instance;
-    private readonly NotificationViewModel _notificationViewModel;
-    private readonly ResourceLoader _resourceLoader;
-    private readonly ProcessChecker _processChecker;
-    private readonly LogEntryViewModel _logEntryViewModel;
-
-    private XamlRoot _xamlRoot;
-
-    private BackupViewModel(XamlRoot xamlRoot) {
-        _xamlRoot = xamlRoot;
-
-        _notificationViewModel = NotificationViewModel.GetNotificationViewModelInstance();
-        _logEntryViewModel = LogEntryViewModel.GetLogEntryViewModelInstance();
-        _resourceLoader = new ResourceLoader();
-        _processChecker = new ProcessChecker();
+    public enum BackupState {
+        Running,
+        Paused,
+        Stopped
     }
 
-    public static BackupViewModel GetBackupViewModelInstance(XamlRoot xamlRoot) {
-        _instance ??= new BackupViewModel(xamlRoot);
-        return _instance;
-    }
+    public partial class BackupViewModel : ObservableRecipient {
+        private static BackupViewModel? _instance;
+        private readonly NotificationViewModel _notificationViewModel;
+        private readonly ResourceLoader _resourceLoader;
+        private readonly LogEntryViewModel _logEntryViewModel;
+        private XamlRoot _xamlRoot;
+        private BackupService? _currentBackupService;
 
-    /// <summary>
-    /// Renvoie l'instance de BackupService correspondante en fonction du type de sauvegarde.
-    /// </summary>
-    public BackupService GetBackupServiceInstance(bool isFullBackup) {
-        return isFullBackup ? BackupServiceComplete.GetBackupServiceCompleteInstance(_xamlRoot) : BackupServiceDifferential.GetBackupServiceDifferentialInstance(_xamlRoot);
-    }
+        public BackupState CurrentBackupState { get; private set; } = BackupState.Stopped;
 
-    public async Task<bool> CanStartBackup(bool isFullBackup) {
-        BackupService backupService = GetBackupServiceInstance(isFullBackup);
-
-        return await backupService.CanStartBackup();
-    }
-
-    public async Task StartBackup(string name, string source, string destination, bool isFullBackup, string backupEncryptionKey, TextBlock textBlock) {
-
-        // Récupération de l'instance de service de sauvegarde appropriée
-        var backupService = GetBackupServiceInstance(isFullBackup);
-        backupService.EncryptionKey = backupEncryptionKey;
-
-        // Vérification des processus Office avant de lancer la sauvegarde
-        bool canStart = await CanStartBackup(isFullBackup);
-        if (!canStart) {
-            await _notificationViewModel.ShowPopupDialog(
-                _resourceLoader.GetString("Backup_OfficeCanceled"),
-                _resourceLoader.GetString("Backup_OfficeCanceled"),
-                String.Empty, "OK", _xamlRoot);
-            return;
+        private BackupViewModel(XamlRoot xamlRoot) {
+            _xamlRoot = xamlRoot;
+            _notificationViewModel = NotificationViewModel.GetNotificationViewModelInstance();
+            _logEntryViewModel = LogEntryViewModel.GetLogEntryViewModelInstance();
+            _resourceLoader = new ResourceLoader();
         }
 
-        if (string.IsNullOrWhiteSpace(name) ||
-            source == _resourceLoader.GetString("BackupPage_NoFolderSelected") ||
-            destination == _resourceLoader.GetString("BackupPage_NoFolderSelected")) {
-            await _notificationViewModel.ShowPopupDialog(
-                _resourceLoader.GetString("BackupPage_FillAllFieldsError"),
-                _resourceLoader.GetString("BackupPage_FillAllFieldsError"),
-                String.Empty, "OK", _xamlRoot);
-            return;
+        public static BackupViewModel GetBackupViewModelInstance(XamlRoot xamlRoot) {
+            _instance ??= new BackupViewModel(xamlRoot);
+            return _instance;
         }
 
-        DirectoryInfo di = new DirectoryInfo(source);
-        long fileSize = di.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(fi => fi.Length);
+        public BackupService GetBackupServiceInstance(bool isFullBackup) {
+            return isFullBackup
+                ? BackupServiceComplete.GetBackupServiceCompleteInstance(_xamlRoot)
+                : BackupServiceDifferential.GetBackupServiceDifferentialInstance(_xamlRoot);
+        }
 
-        try {
-            double elapsedTime = await GetBackupServiceInstance(isFullBackup).RunBackup(name, source, destination, isFullBackup, textBlock); ;
+        public async Task StartBackup(string name, string source, string destination, bool isFullBackup, string backupEncryptionKey, TextBlock textBlock) {
+            if (CurrentBackupState == BackupState.Running) return;
 
-            _logEntryViewModel.WriteLog(name, source, destination, fileSize, elapsedTime);
-        } catch (Exception ex) {
-            await _notificationViewModel.ShowPopupDialog(
-                $"{_resourceLoader.GetString("BackupPage_BackupError")} {ex.Message}",
-                $"{_resourceLoader.GetString("BackupPage_BackupError")} {ex.Message}",
-                String.Empty, "OK", _xamlRoot);
-        }        
+            _currentBackupService = GetBackupServiceInstance(isFullBackup);
+            _currentBackupService.EncryptionKey = backupEncryptionKey;
+
+            CurrentBackupState = BackupState.Running;
+            double elapsedTime = await _currentBackupService.RunBackup(name, source, destination, isFullBackup, textBlock);
+            _logEntryViewModel.WriteLog(name, source, destination, new DirectoryInfo(source).EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(fi => fi.Length), elapsedTime);
+            CurrentBackupState = BackupState.Stopped;
+        }
+
+        public void PauseBackup() {
+            if (_currentBackupService != null && CurrentBackupState == BackupState.Running) {
+                _currentBackupService.PauseBackup();
+                CurrentBackupState = BackupState.Paused;
+            }
+        }
+
+        public void ResumeBackup() {
+            if (_currentBackupService != null && CurrentBackupState == BackupState.Paused) {
+                _currentBackupService.ResumeBackup();
+                CurrentBackupState = BackupState.Running;
+            }
+        }
+
+        public void StopBackup() {
+            if (_currentBackupService != null && CurrentBackupState != BackupState.Stopped) {
+                _currentBackupService.StopBackup();
+                CurrentBackupState = BackupState.Stopped;
+            }
+        }
     }
 }

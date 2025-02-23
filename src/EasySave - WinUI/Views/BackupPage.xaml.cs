@@ -61,4 +61,19 @@ public sealed partial class BackupPage : Page
 
         backupViewModel.StartBackup(backupName, sourcePath, destinationPath, isFullBackup, encryptionKey, ProgressTextBox);
     }
+
+    private void PauseBackup_Click(object sender, RoutedEventArgs e) {
+        BackupViewModel backupViewModel = BackupViewModel.GetBackupViewModelInstance(this.XamlRoot);
+        backupViewModel.PauseBackup();
+    }
+
+    private void ResumeBackup_Click(object sender, RoutedEventArgs e) {
+        BackupViewModel backupViewModel = BackupViewModel.GetBackupViewModelInstance(this.XamlRoot);
+        backupViewModel.ResumeBackup();
+    }
+
+    private void StopBackup_Click(object sender, RoutedEventArgs e) {
+        BackupViewModel backupViewModel = BackupViewModel.GetBackupViewModelInstance(this.XamlRoot);
+        backupViewModel.StopBackup();
+    }
 }
