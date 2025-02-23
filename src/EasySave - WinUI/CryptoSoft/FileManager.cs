@@ -103,7 +103,11 @@ public class FileManager
         var result = new byte[fileBytes.Count];
         for (var i = 0; i < fileBytes.Count; i++)
         {
-            result[i] = (byte)(fileBytes[i] ^ keyBytes[i % keyBytes.Count]);
+            if(keyBytes.Count != 0) {
+                result[i] = (byte)(fileBytes[i] ^ keyBytes[i % keyBytes.Count]);
+            } else {
+                result[i] = fileBytes[i];
+            }
         }
         return result;
     }

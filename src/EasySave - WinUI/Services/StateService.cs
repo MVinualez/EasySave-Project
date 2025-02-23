@@ -71,13 +71,13 @@ namespace EasySave___WinUI.Services {
             }
         }
 
-        public void AddFileToState(string jobName, string sourceFilePath, string targetFilePath, int fileSize) {
+        public void AddFileToState(string jobName, string sourceFilePath, string targetFilePath, long fileSize) {
             Dictionary<string, StateModel> states = LoadState();
 
-            if (!states.ContainsKey(jobName)) {
-                _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_JobDoesntExists"), string.Format(_resourceLoader.GetString("State_JobDoesntExistsContent"), jobName), string.Empty, "OK", _xamlRoot);
-                return;
-            }
+            //if (!states.ContainsKey(jobName)) {
+            //    _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_JobDoesntExists"), string.Format(_resourceLoader.GetString("State_JobDoesntExistsContent"), jobName), string.Empty, "OK", _xamlRoot);
+            //    return;
+            //}
 
             StateModel state = states[jobName];
 
@@ -92,16 +92,16 @@ namespace EasySave___WinUI.Services {
 
             states[jobName] = state;
             SaveState(states);
-            _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_FileAdded"), string.Format(_resourceLoader.GetString("State_FileAdded"), sourceFilePath, jobName), string.Empty, "OK", _xamlRoot);
+            //_notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_FileAdded"), string.Format(_resourceLoader.GetString("State_FileAdded"), sourceFilePath, jobName), string.Empty, "OK", _xamlRoot);
         }
 
-        public void UpdateFileTransfer(string jobName, string sourceFilePath, int fileSize) {
+        public void UpdateFileTransfer(string jobName, string sourceFilePath, long fileSize) {
             Dictionary<string, StateModel> states = LoadState();
 
-            if (!states.ContainsKey(jobName)) {
-                _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_JobDoesntExists"), string.Format(_resourceLoader.GetString("State_JobDoesntExistsContent"), jobName), string.Empty, "OK", _xamlRoot);
-                return;
-            }
+            //if (!states.ContainsKey(jobName)) {
+            //    _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_JobDoesntExists"), string.Format(_resourceLoader.GetString("State_JobDoesntExistsContent"), jobName), string.Empty, "OK", _xamlRoot);
+            //    return;
+            //}
 
             StateModel state = states[jobName];
 
@@ -118,19 +118,19 @@ namespace EasySave___WinUI.Services {
 
                 states[jobName] = state;
                 SaveState(states);
-                _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_FileTransferInProgress"), string.Format(_resourceLoader.GetString("State_FileTransferInProgress"), sourceFilePath, fileSize), string.Empty, "OK", _xamlRoot);
+                //_notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_FileTransferInProgress"), string.Format(_resourceLoader.GetString("State_FileTransferInProgress"), sourceFilePath, fileSize), string.Empty, "OK", _xamlRoot);
             } else {
-                _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_NoPendingFiles"), string.Format(_resourceLoader.GetString("State_NoPendingFiles"), jobName), string.Empty, "OK", _xamlRoot);
+                //_notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_NoPendingFiles"), string.Format(_resourceLoader.GetString("State_NoPendingFiles"), jobName), string.Empty, "OK", _xamlRoot);
             }
         }
 
         public void CompleteJob(string jobName) {
             Dictionary<string, StateModel> states = LoadState();
 
-            if (!states.ContainsKey(jobName)) {
-                _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_JobDoesntExists"), string.Format(_resourceLoader.GetString("State_JobDoesntExistsContent"), jobName), string.Empty, "OK", _xamlRoot);
-                return;
-            }
+            //if (!states.ContainsKey(jobName)) {
+            //    _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_JobDoesntExists"), string.Format(_resourceLoader.GetString("State_JobDoesntExistsContent"), jobName), string.Empty, "OK", _xamlRoot);
+            //    return;
+            //}
 
             StateModel state = states[jobName];
 
@@ -138,9 +138,9 @@ namespace EasySave___WinUI.Services {
                 state.State = "Completed";
                 states[jobName] = state;
                 SaveState(states);
-                _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_JobCompleted"), string.Format(_resourceLoader.GetString("State_JobCompleted"), jobName), string.Empty, "OK", _xamlRoot);
+                //_notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_JobCompleted"), string.Format(_resourceLoader.GetString("State_JobCompleted"), jobName), string.Empty, "OK", _xamlRoot);
             } else {
-                _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_JobNotFinished"), string.Format(_resourceLoader.GetString("State_JobNotFinished"), jobName, state.NumberOfFilesRemaining), string.Empty, "OK", _xamlRoot);
+                //_notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_JobNotFinished"), string.Format(_resourceLoader.GetString("State_JobNotFinished"), jobName, state.NumberOfFilesRemaining), string.Empty, "OK", _xamlRoot);
             }
         }
     }

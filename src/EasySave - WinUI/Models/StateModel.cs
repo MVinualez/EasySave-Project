@@ -6,10 +6,10 @@ namespace EasySave___WinUI.Models {
         public int Timestamp { get; set; }
         public string State { get; set; }
         public int NumberOfFilesRemaining { get; set; }
-        public int TotalFilesSize { get; set; }
+        public long TotalFilesSize { get; set; }
         public StateProgressModel Progress { get; set; }
 
-        public StateModel(string jobName, int timestamp, string state, int numberOfFilesRemaining, int totalFilesSize, StateProgressModel progress) {
+        public StateModel(string jobName, int timestamp, string state, int numberOfFilesRemaining, long totalFilesSize, StateProgressModel progress) {
             JobName = jobName;
             Timestamp = timestamp;
             State = state;

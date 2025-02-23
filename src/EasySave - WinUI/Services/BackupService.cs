@@ -1,187 +1,103 @@
-﻿using EasySave___WinUI.Models;
-using System.Reflection;
+﻿using EasySaveLibrary.Services;
+using System;
+using System.IO;
+using EasySaveLibrary.ViewModels;
+using EasySave___WinUI.Models;
+using Microsoft.UI.Xaml;
+using EasySave___WinUI.ViewModels;
+using Windows.ApplicationModel.Resources;
+using Microsoft.UI.Xaml.Controls;
 using EasySave___WinUI.CryptoSoft;
+using System.Reflection;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace EasySave___WinUI.Services {
-    internal class BackupService {
-        public string encryptionKey { get; set; }
-        private static BackupService _instanceBackupService;
+    public abstract class BackupService {
+        private readonly LogEntryViewModel _logEntryViewModel;
+        private readonly ProcessChecker _processChecker;
+        private readonly StateViewModel _stateViewModel;
+        private readonly NotificationViewModel _notificationViewModel;
+        private readonly ResourceLoader _resourceLoader;
 
-        public static BackupService getInstanceBackupService()
-        {
-            if (_instanceBackupService == null)
-            {               
-               _instanceBackupService = new BackupService();
-            }
-            return _instanceBackupService;
+        public XamlRoot XamlRoot { get; }
+        public string EncryptionKey { get; set; }
+
+        protected BackupService(XamlRoot xamlRoot) {
+            XamlRoot = xamlRoot;
+            EncryptionKey = string.Empty;
+            _logEntryViewModel = LogEntryViewModel.GetLogEntryViewModelInstance();
+            _stateViewModel = StateViewModel.GetStateViewModelInstance(XamlRoot);
+            _notificationViewModel = NotificationViewModel.GetNotificationViewModelInstance();
+            _processChecker = new ProcessChecker();
+            _resourceLoader = new ResourceLoader();
         }
 
-        public void RunBackup(BackupJob job) {
+        public bool CanStartBackup() {
+            return _processChecker.IsOfficeAppRunning();
+        }
 
-            string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName);
-            path = path != null && path.Length >= 1 ? path : Directory.GetCurrentDirectory();
-
-            string dirName = "Backup";
-            string fullPathBackup = Path.Combine(path, dirName);
-            if (!Directory.Exists(Path.Combine(path, dirName))) {
-                Directory.CreateDirectory(Path.Combine(path, dirName));
-            }
-
-            Console.WriteLine($"Démarrage de la sauvegarde : {job.Name}");
-            Console.WriteLine($"Source : {job.Source}");
-            Console.WriteLine($"Destination : {job.Destination}");
-
+        public async Task<double> RunBackup(string name, string source, string destination, bool isFullBackup, TextBlock textBlock) {
+            Stopwatch stopwatch = Stopwatch.StartNew();
             try {
-                if (!Directory.Exists(job.Source)) {
-                    Console.WriteLine("⚠️ Dossier source introuvable !");
-                    return;
+                if (!Directory.Exists(source)) {
+                    await _notificationViewModel.ShowPopupDialog(
+                        _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
+                        _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
+                        string.Empty, "OK", XamlRoot);
+                    return 0;
                 }
 
-                Directory.CreateDirectory(job.Destination);
+                _stateViewModel.RegisterJobState(name);
 
-                string[] files = Directory.GetFiles(job.Source);
+                string fullPathBackup = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Backup");
+                Directory.CreateDirectory(fullPathBackup);
 
-                foreach (var file in files) {
-                    string fileName = Path.GetFileName(file);
-                    string destFile = Path.Combine(job.Destination, fileName);
-                    string destFileBackcup = Path.Combine(fullPathBackup, fileName);
-                    CopyDirectoryRecursively(job.Source, job.Destination);
-                    CopyDirectoryRecursively(job.Source, fullPathBackup);
-                    //Encrypt_Recursively(destFile, key);  
-                    File.Copy(file, destFileBackcup, true);
-                    Console.WriteLine($"✅ {fileName} copié !");
-                    Console.WriteLine($"✅ {fileName} copié dans le Backup !");
-                }
+                await CopyDirectoryReccursively(name, source, destination, isFullBackup, textBlock);
+                await CopyDirectoryReccursively(name, source, fullPathBackup, isFullBackup, textBlock);
 
-                var fileManager = new FileManager(job.Destination, [ ".docx", ".txt" ], encryptionKey);
+                var fileManager = new FileManager(destination, [".docx", ".txt"], EncryptionKey);
                 fileManager.Transform();
-                Console.WriteLine("🎉 Sauvegarde terminée !");
+                _stateViewModel.CompleteJobState(name);
+
+                textBlock.DispatcherQueue.TryEnqueue(() => {
+                    textBlock.Text = _resourceLoader.GetString("BackupPage_BackupFinished");
+                });
+
             } catch (Exception ex) {
                 Console.WriteLine($"❌ Erreur : {ex.Message}");
             }
+
+            stopwatch.Stop();
+            return stopwatch.Elapsed.TotalSeconds;
         }
 
-
-
-        //private void Encrypt_Recursively(string destFile, string key)
-        //{
-        //    Console.WriteLine($"🔍 Chemin fichier à chiffrer : {destFile}");
-        //    //var file_encrypt = new FileManager(destFile, key);
-        //    //file_encrypt.TransformFile();
-        //    Console.WriteLine($"Taille après chiffrement : {new FileInfo(destFile).Length} octets");
-        //    if (File.Exists(destFile) && new FileInfo(destFile).IsReadOnly)
-        //    {
-        //        Console.WriteLine($"⚠️ Le fichier {destFile} est en lecture seule !");
-        //    }
-        //}
-        private void CopyDirectoryRecursively(string sourceDir, string targetDir) {
-            foreach (string dir in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories)) {
-                string targetSubDir = dir.Replace(sourceDir, targetDir);
+        public async Task CopyDirectoryReccursively(string name, string source, string target, bool isFullBackup, TextBlock textBlock) {
+            foreach (string dir in Directory.GetDirectories(source, "*", SearchOption.AllDirectories)) {
+                string targetSubDir = dir.Replace(source, target);
                 Directory.CreateDirectory(targetSubDir);
             }
 
-            foreach (string file in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories)) {
-                string destFile = file.Replace(sourceDir, targetDir);
-                File.Copy(file, destFile, true);
-                Console.WriteLine($"✅ {file} → {destFile}");
-                //                Encrypt_Recursively(destFile, key);
-            }
-        }
-        public void RunDifferentialBackup(BackupJob job) {
-            Console.WriteLine($"🔄 Démarrage de la sauvegarde différentielle : {job.Name}");
-            Console.WriteLine($"📂 Source : {job.Source}");
-            Console.WriteLine($"💾 Destination : {job.Destination}");
+            foreach (string file in Directory.GetFiles(source, "*.*", SearchOption.AllDirectories)) {
+                string fileName = Path.GetFileName(file);
+                string destFile = Path.Combine(target, fileName);
+                long fileSize = new FileInfo(file).Length;
 
-            try {
-                if (!Directory.Exists(job.Source)) {
-                    Console.WriteLine("⚠️ Dossier source introuvable !");
-                    return;
-                }
+                await Task.Run(() => {
+                    if (ShouldCopyFile(file, destFile)) {
+                        textBlock.DispatcherQueue.TryEnqueue(() => {
+                            textBlock.Text = string.Format(_resourceLoader.GetString("BackupPage_BackupInProgress"), fileName);
+                        });
 
-                Directory.CreateDirectory(job.Destination);
-
-                string[] files = Directory.GetFiles(job.Source);
-                string[] filesDestination = Directory.GetFiles(job.Destination);
-
-                HashSet<string> existingFiles = new HashSet<string>(filesDestination.Select(Path.GetFileName));
-
-                int copiedFiles = 0;
-
-                foreach (var file in files) {
-                    string fileName = Path.GetFileName(file);
-                    string destFile = Path.Combine(job.Destination, fileName);
-
-                    if (!existingFiles.Contains(fileName) || File.GetLastWriteTime(file) > File.GetLastWriteTime(destFile)) {
-                        CopyModifiedFilesRecursively(job.Source, job.Destination);
-                        Console.WriteLine($"✅ {fileName} copié !");
-                        copiedFiles++;
+                        _stateViewModel.TrackFileInState(name, file, destFile, fileSize);
+                        File.Copy(file, destFile, true);
+                        _stateViewModel.MarkFileAsProcessed(name, file, fileSize);
                     }
-                }
-                var fileManager = new FileManager(job.Destination, new List<string> { ".pdf", ".docx", ".txt" }, encryptionKey);
-                fileManager.Transform();
-                if (copiedFiles == 0) {
-                    Console.WriteLine("✨ Aucun nouveau fichier, rien à bouger.");
-                } else {
-                    Console.WriteLine($"🎉 Sauvegarde terminée ! {copiedFiles} fichiers copiés.");
-                }
-            } catch (Exception ex) {
-                Console.WriteLine($"❌ Erreur : {ex.Message}");
+                });
             }
         }
 
-        private void CopyModifiedFilesRecursively(string sourceDir, string targetDir) {
-            foreach (string dir in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories)) {
-                string targetSubDir = dir.Replace(sourceDir, targetDir);
-                if (!Directory.Exists(targetSubDir)) {
-                    Directory.CreateDirectory(targetSubDir);
-                }
-            }
-
-            foreach (string file in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories)) {
-                string destFile = file.Replace(sourceDir, targetDir);
-
-                if (!File.Exists(destFile) || File.GetLastWriteTime(file) > File.GetLastWriteTime(destFile)) {
-                    File.Copy(file, destFile, true);
-                    Console.WriteLine($"✅ {file} → {destFile}");
-                }
-            }
-        }
-
-
-        public void RunRestauration(BackupJob job) {
-            Console.WriteLine($"🔄 Démarrage de la restauration : {job.Name}");
-
-            if (!Directory.Exists(job.Destination)) {
-                Console.WriteLine("⚠️ Aucune sauvegarde trouvée à cet emplacement !");
-                return;
-            }
-
-            try {
-                Directory.CreateDirectory(job.Source);
-
-                string[] backupFiles = Directory.GetFiles(job.Destination);
-                int restoredFiles = 0;
-
-                foreach (var backupFile in backupFiles) {
-                    string fileName = Path.GetFileName(backupFile);
-                    string originalFile = Path.Combine(job.Source, fileName);
-
-                    File.Copy(backupFile, originalFile, true);
-                    Console.WriteLine($"✅ {fileName} restauré !");
-                    restoredFiles++;
-                }
-
-                if (restoredFiles == 0) {
-                    Console.WriteLine("✨ Aucun fichier à restaurer.");
-                } else {
-                    Console.WriteLine($"🎉 Restauration terminée ! {restoredFiles} fichiers restaurés.");
-                }
-            } catch (Exception ex) {
-                Console.WriteLine($"❌ Erreur lors de la restauration : {ex.Message}");
-            }
-
-        }
-
+        protected abstract bool ShouldCopyFile(string sourceFile, string destFile);
 
     }
 }
