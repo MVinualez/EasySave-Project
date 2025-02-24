@@ -12,14 +12,11 @@ namespace EasySaveLibrary.ViewModels
         private static LogEntryViewModel? _instance;
         private LogService logService;
         private string _logFormat;
-        private readonly string configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "EasySave", "config.txt");
-
 
 
         private LogEntryViewModel()
         {
             logService = LogService.GetLogServiceInstance();
-            _logFormat = File.Exists(configPath) ? File.ReadAllText(configPath) : "JSON";
         }
 
         public static LogEntryViewModel GetLogEntryViewModelInstance()
@@ -44,6 +41,8 @@ namespace EasySaveLibrary.ViewModels
             {
                 _logFormat = format;
             }
+
+            logService.LogFormat = _logFormat;
         }
 
     }
