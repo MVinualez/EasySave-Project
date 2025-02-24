@@ -9,15 +9,22 @@ using EasySaveLibrary.Models;
 using System.Diagnostics;
 using EasySave___WinUI.Models;
 using Microsoft.UI.Xaml.Controls;
-using easysave_project.CryptoSoft;
 using System.Security.Cryptography;
 using System.Runtime.CompilerServices;
+using EasySave___WinUI.Services;
+using EasySave___WinUI.ViewModels;
 
 namespace easysave_project.Services {
     internal class BackupService {
         public string encryptionKey { get; set; }
         private static BackupService _instanceBackupService;
+        private EncryptionViewModel _encryptionViewModel;
 
+
+        private BackupService()
+        {
+            _encryptionViewModel = EncryptionViewModel.GetEncryptionViewModelInstance();
+        }
         public static BackupService getInstanceBackupService()
         {
             if (_instanceBackupService == null)
@@ -64,27 +71,13 @@ namespace easysave_project.Services {
                     Console.WriteLine($"✅ {fileName} copié dans le Backup !");
                 }
 
-                var fileManager = new FileManager(job.Destination, [ ".docx", ".txt" ], encryptionKey);
-                fileManager.Transform();
+                _encryptionViewModel.EncryptFile(job.Destination, new List<string> { ".pdf", ".docx", ".txt" }, encryptionKey);
                 Console.WriteLine("🎉 Sauvegarde terminée !");
             } catch (Exception ex) {
                 Console.WriteLine($"❌ Erreur : {ex.Message}");
             }
         }
 
-
-
-        //private void Encrypt_Recursively(string destFile, string key)
-        //{
-        //    Console.WriteLine($"🔍 Chemin fichier à chiffrer : {destFile}");
-        //    //var file_encrypt = new FileManager(destFile, key);
-        //    //file_encrypt.TransformFile();
-        //    Console.WriteLine($"Taille après chiffrement : {new FileInfo(destFile).Length} octets");
-        //    if (File.Exists(destFile) && new FileInfo(destFile).IsReadOnly)
-        //    {
-        //        Console.WriteLine($"⚠️ Le fichier {destFile} est en lecture seule !");
-        //    }
-        //}
         private void CopyDirectoryRecursively(string sourceDir, string targetDir) {
             foreach (string dir in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories)) {
                 string targetSubDir = dir.Replace(sourceDir, targetDir);
@@ -128,8 +121,7 @@ namespace easysave_project.Services {
                         copiedFiles++;
                     }
                 }
-                var fileManager = new FileManager(job.Destination, new List<string> { ".pdf", ".docx", ".txt" }, encryptionKey);
-                fileManager.Transform();
+                _encryptionViewModel.EncryptFile(job.Destination, new List<string> { ".pdf", ".docx", ".txt" }, encryptionKey);
                 if (copiedFiles == 0) {
                     Console.WriteLine("✨ Aucun nouveau fichier, rien à bouger.");
                 } else {

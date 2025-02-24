@@ -1,49 +1,43 @@
 ﻿using System.Diagnostics;
 using easysave_project.Models;
 using System.Text;
+using EasySave___WinUI.ViewModels;
+using static System.Net.Mime.MediaTypeNames;
+using EasySave___WinUI.ViewModels;
 
-namespace easysave_project.CryptoSoft;
+namespace EasySave___WinUI.Services;
 
 /// <summary>
 /// File manager class
 /// This class is used to encrypt and decrypt files and directories recursively.
 /// </summary>
-public class FileManager
+public class EncryptionService
 {
     private string PathToProcess { get; }
     private List<string> AllowedExtensions { get; }
     private string Key { get; }
-    /// <summary>
-    /// Ask the user to enter an encryption key
-    /// </summary>
-    /// 
 
-    public FileManager(string path, List<string> allowedExtensions, string key) {
+    private static EncryptionService _instance;
+
+
+    private EncryptionService(string path, List<string> allowedExtensions, string key)
+    {
         PathToProcess = path;
         AllowedExtensions = allowedExtensions;
         Key = key;
     }
- 
-    private static string GetEncryptionKey()
+
+
+    public static EncryptionService GetEncryptionServiceInstance(string path, List<string> allowedExtensions, string key)
     {
-        string key; 
-        do
-        {
-            Console.Write("🔑 Entrez la clé de chiffrement : ");
-            key = Console.ReadLine()?.Trim();
+        _instance ??= new EncryptionService(path, allowedExtensions, key);
 
-            if (string.IsNullOrWhiteSpace(key))
-                Console.WriteLine("⚠️ La clé de chiffrement ne peut pas être vide !");
 
-        } while (string.IsNullOrWhiteSpace(key));
-
-        return key;
+        return _instance;
     }
 
-    /// <summary>
-    /// Encrypt a file or all files in a directory recursively
-    /// </summary>
-    public void Transform()
+
+    public void Transform(string PathToProcess, List<string> AllowedExtensions, string Key)
     {
         if (File.Exists(PathToProcess))
         {

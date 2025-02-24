@@ -87,7 +87,7 @@ public sealed partial class BackupPage : Page
 
         try
         {
-            stateCreator(backupName, sourcePath, destinationPath);
+            // j'ai mis des commentaires car cette méthode copie les fichiers mais sans les chiffrer  |  stateCreator(backupName, sourcePath, destinationPath);
 
             Stopwatch stopwatch = Stopwatch.StartNew();
             if (DifferentialBackupRadioButton.IsChecked == true)
@@ -108,10 +108,12 @@ public sealed partial class BackupPage : Page
         {
             ShowMessage($"{_resourceLoader.GetString("BackupPage_BackupError")} {ex.Message}");
         }
+        ProgressTextBox.Text = _resourceLoader.GetString("BackupPage_BackupFinished");
+
     }
 
     // Lancer la sauvegarde
-  
+
 
     private void stateCreator(string backupName, string sourcePath, string destinationPath)
     {

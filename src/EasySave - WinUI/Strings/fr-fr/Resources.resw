@@ -221,4 +221,7 @@
   <data name="BackupPage_EncryptionKey.Text" xml:space="preserve">
     <value>Clef de chiffrement</value>
   </data>
+  <data name="BackupPage_BackupEncryptionFileTypeNotAllowed" xml:space="preserve">
+    <value>kk</value>
+  </data>
 </root>
