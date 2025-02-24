@@ -19,6 +19,8 @@ namespace easysave_project.Services {
         public string encryptionKey { get; set; }
         private static BackupService _instanceBackupService;
         private EncryptionViewModel _encryptionViewModel;
+        private Stopwatch copyStopwatch;
+        private Stopwatch encryptionStopwatch;
 
 
         private BackupService()
@@ -27,15 +29,13 @@ namespace easysave_project.Services {
         }
         public static BackupService getInstanceBackupService()
         {
-            if (_instanceBackupService == null)
-            {               
-               _instanceBackupService = new BackupService();
-            }
+            _instanceBackupService ??= new BackupService();
             return _instanceBackupService;
         }
 
-        public void RunBackup(BackupJob job) {
+        public void RunBackup(BackupJob job, Stopwatch copyStopwatch, Stopwatch encryptionStopwatch) {
 
+            copyStopwatch.Start();
             string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName);
             path = path != null && path.Length >= 1 ? path : Directory.GetCurrentDirectory();
 
@@ -70,8 +70,10 @@ namespace easysave_project.Services {
                     Console.WriteLine($"✅ {fileName} copié !");
                     Console.WriteLine($"✅ {fileName} copié dans le Backup !");
                 }
-
-                _encryptionViewModel.EncryptFile(job.Destination, new List<string> { ".pdf", ".docx", ".txt" }, encryptionKey);
+                copyStopwatch.Stop();
+                encryptionStopwatch.Start();
+                _encryptionViewModel.EncryptFile(job.Destination, new List<string> { ".pdf", ".docx", ".txt",".mp4" }, encryptionKey);
+                encryptionStopwatch.Stop();
                 Console.WriteLine("🎉 Sauvegarde terminée !");
             } catch (Exception ex) {
                 Console.WriteLine($"❌ Erreur : {ex.Message}");
@@ -88,10 +90,10 @@ namespace easysave_project.Services {
                 string destFile = file.Replace(sourceDir, targetDir);
                 File.Copy(file, destFile, true);
                 Console.WriteLine($"✅ {file} → {destFile}");
-                //                Encrypt_Recursively(destFile, key);
+                
             }
         }
-        public void RunDifferentialBackup(BackupJob job) {
+        public void RunDifferentialBackup(BackupJob job, Stopwatch copyStopwatch, Stopwatch encryptionStopwatch) {
             Console.WriteLine($"🔄 Démarrage de la sauvegarde différentielle : {job.Name}");
             Console.WriteLine($"📂 Source : {job.Source}");
             Console.WriteLine($"💾 Destination : {job.Destination}");

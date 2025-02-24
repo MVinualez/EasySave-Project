@@ -89,19 +89,21 @@ public sealed partial class BackupPage : Page
         {
             // j'ai mis des commentaires car cette méthode copie les fichiers mais sans les chiffrer  |  stateCreator(backupName, sourcePath, destinationPath);
 
-            Stopwatch stopwatch = Stopwatch.StartNew();
+            Stopwatch copyStopwatch = Stopwatch.StartNew();
+            Stopwatch encryptionStopwatch = new Stopwatch();
             if (DifferentialBackupRadioButton.IsChecked == true)
             {
-                _backupJobController.StartDiffBackup(backupName, sourcePath, destinationPath, CompleteBackupRadioButton.IsChecked ?? true);
+                _backupJobController.StartDiffBackup(backupName, sourcePath, destinationPath, CompleteBackupRadioButton.IsChecked ?? true,copyStopwatch, encryptionStopwatch);
             }
             else
             {
-                _backupJobController.StartBackup(backupName, sourcePath, destinationPath, CompleteBackupRadioButton.IsChecked ?? true);
+                _backupJobController.StartBackup(backupName, sourcePath, destinationPath, CompleteBackupRadioButton.IsChecked ?? true, copyStopwatch, encryptionStopwatch);
             }
-            stopwatch.Stop();
+            double elapsedTime = copyStopwatch.Elapsed.TotalSeconds;
+            double encryptionTime = encryptionStopwatch.Elapsed.TotalSeconds;
 
-            double elapsedTime = stopwatch.Elapsed.TotalSeconds;
-            LogEntry logEntry = new LogEntry(backupName, sourcePath, destinationPath, fileSize, elapsedTime);
+
+            LogEntry logEntry = new LogEntry(backupName, sourcePath, destinationPath, fileSize, elapsedTime, encryptionTime);
             _logController.SaveLog(logEntry);
         }
         catch (Exception ex)

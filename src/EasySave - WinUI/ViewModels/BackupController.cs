@@ -1,4 +1,5 @@
-﻿using EasySave___WinUI.Models;
+﻿using System.Diagnostics;
+using EasySave___WinUI.Models;
 using easysave_project.Models;
 using easysave_project.Services;
 using Microsoft.UI.Xaml;
@@ -40,16 +41,16 @@ namespace easysave_project.Controllers
             _backupService = backupService;
         }
 
-        public void StartBackup(string name, string source, string destination, bool isFullBackup)
+        public void StartBackup(string name, string source, string destination, bool isFullBackup, Stopwatch copyStopwatch, Stopwatch encryptionStopwatch)
         {
             var job = new BackupJob(name, source, destination, isFullBackup);
-            _backupService.RunBackup(job);
+            _backupService.RunBackup(job, copyStopwatch, encryptionStopwatch);
         }
 
-        public void StartDiffBackup(string name, string source, string destination, bool isFullBackup)
+        public void StartDiffBackup(string name, string source, string destination, bool isFullBackup, Stopwatch copyStopwatch, Stopwatch encryptionStopwatch)
         {
             var job = new BackupJob(name, source, destination, isFullBackup);
-            _backupService.RunDifferentialBackup(job);
+            _backupService.RunDifferentialBackup(job, copyStopwatch, encryptionStopwatch);
 
         }
         public void StartRestauration(string name, string source, string destination, bool isFullBackup)
