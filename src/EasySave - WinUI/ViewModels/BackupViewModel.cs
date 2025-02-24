@@ -23,10 +23,13 @@ namespace EasySave___WinUI.ViewModels {
         private readonly LogEntryViewModel _logEntryViewModel;
         private XamlRoot _xamlRoot;
         private BackupService? _currentBackupService;
+        private BackupSocketServer? _socketServer;
 
         public BackupState CurrentBackupState { get; private set; } = BackupState.Stopped;
 
         private BackupViewModel(XamlRoot xamlRoot) {
+            _socketServer = new BackupSocketServer();
+            _ = _socketServer.StartServer();
             _xamlRoot = xamlRoot;
             _notificationViewModel = NotificationViewModel.GetNotificationViewModelInstance();
             _logEntryViewModel = LogEntryViewModel.GetLogEntryViewModelInstance();
@@ -39,9 +42,13 @@ namespace EasySave___WinUI.ViewModels {
         }
 
         public BackupService GetBackupServiceInstance(bool isFullBackup) {
-            return isFullBackup
+            BackupService backupService = isFullBackup
                 ? BackupServiceComplete.GetBackupServiceCompleteInstance(_xamlRoot)
                 : BackupServiceDifferential.GetBackupServiceDifferentialInstance(_xamlRoot);
+
+            _socketServer?.SetBackupService(backupService);
+
+            return backupService;
         }
 
         public async Task StartBackup(string name, string source, string destination, bool isFullBackup, string backupEncryptionKey, TextBlock textBlock) {
