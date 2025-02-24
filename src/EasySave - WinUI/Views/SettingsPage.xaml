@@ -60,6 +60,14 @@
                     <ComboBoxItem Tag="es-419">Español (Latinoamérica)</ComboBoxItem>
             </ComboBox>
 
+            <TextBlock x:Uid="Settings_LogFormat" Text="Log Format" />
+            <ComboBox x:Name="LogFormat"
+                  SelectionChanged="LogFormat_SelectionChanged"
+                  Margin="{StaticResource XSmallTopMargin}">
+                <ComboBoxItem Tag="JSON">JSON</ComboBoxItem>
+                <ComboBoxItem Tag="XML">XML</ComboBoxItem>
+            </ComboBox>
+
 
             <TextBlock x:Uid="Settings_About" Style="{ThemeResource SubtitleTextBlockStyle}" />
 
