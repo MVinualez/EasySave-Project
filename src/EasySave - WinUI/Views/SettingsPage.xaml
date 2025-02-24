@@ -50,7 +50,7 @@
                     </RadioButton>
                 </StackPanel>
             </StackPanel>
-
+    
             <TextBlock x:Uid="Settings_Language" Text="Language" />
             <ComboBox x:Name="LanguageSelector"
               SelectionChanged="LanguageSelector_SelectionChanged"
@@ -60,13 +60,8 @@
                     <ComboBoxItem Tag="es-419">Español (Latinoamérica)</ComboBoxItem>
             </ComboBox>
 
-            <TextBlock x:Uid="Settings_LogFormat" Text="Log Format" />
-            <ComboBox x:Name="LogFormat"
-                  SelectionChanged="LogFormat_SelectionChanged"
-                  Margin="{StaticResource XSmallTopMargin}">
-                <ComboBoxItem Tag="JSON">JSON</ComboBoxItem>
-                <ComboBoxItem Tag="XML">XML</ComboBoxItem>
-            </ComboBox>
+            <RadioButton x:Name="JsonRadioButton" Content="JSON" GroupName="LogFormatGroup" IsChecked="True" Checked="LogFormat_Checked"/>
+            <RadioButton x:Name="XmlRadioButton" Content="XML" GroupName="LogFormatGroup" Checked="LogFormat_Checked"/>
 
 
             <TextBlock x:Uid="Settings_About" Style="{ThemeResource SubtitleTextBlockStyle}" />

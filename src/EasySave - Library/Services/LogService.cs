@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using EasySaveLibrary.Models;
 using System.Reflection;
 using System.Xml.Serialization;
+using Formatting = Newtonsoft.Json.Formatting;
 
 namespace EasySaveLibrary.Services
 {
@@ -38,13 +39,6 @@ namespace EasySaveLibrary.Services
             return _instance;
         }
 
-        public void SetLogFormat(string format)
-        {
-            if (format == "JSON" || format == "XML")
-            {
-                LogFormat = format;
-            }
-        }
 
         // LogController method of the LogController class, which uses the Exists method from the System.IO.Directory class 
         // and takes the logDirectory variable as a parameter
@@ -69,9 +63,15 @@ namespace EasySaveLibrary.Services
                     : DeserializeXml<List<LogEntryModel>>(existingLog) ?? new List<LogEntryModel>();
             }
 
-            // Add the new entry and save
             logEntries.Add(log);
-            File.WriteAllText(logFilePath, JsonConvert.SerializeObject(logEntries, Newtonsoft.Json.Formatting.Indented));
+            if (LogFormat == "JSON")
+            {
+                File.WriteAllText(logFilePath, JsonConvert.SerializeObject(logEntries, Newtonsoft.Json.Formatting.Indented));
+            }
+            else
+            {
+                File.WriteAllText(logFilePath, SerializeXml(logEntries));
+            }
         }
 
         private string SerializeXml<T>(T data)
