@@ -17,13 +17,13 @@
             <TextBox x:Name="BackupNameTextBox" Width="200" Margin="0,0,0,5"/>
         </StackPanel>
 
-        <TextBlock x:Uid="BackupPage_DestinationFolder" Grid.Row="1" Margin="0,0,30,5"/>
+        <TextBlock x:Uid="BackupPage_SourceFolder" Grid.Row="1" Margin="0,0,30,5"/>
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
             <Button x:Uid="BackupPage_Browse" Click="SelectSourceFolder_Click" Margin="0,0,0,0"/>
             <TextBlock x:Name="SourcePathText" x:Uid="BackupPage_NoFolderSelected" VerticalAlignment="Center"/>
         </StackPanel>
 
-        <TextBlock x:Uid="BackupPage_SourceFolder" Grid.Row="2" Margin="0,0,30,5"/>
+        <TextBlock x:Uid="BackupPage_DestinationFolder" Grid.Row="2" Margin="0,0,30,5"/>
         <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
             <Button x:Uid="BackupPage_Browse" Click="SelectDestinationFolder_Click" Margin="0,0,0,0"/>
             <TextBlock x:Name="DestinationPathText" x:Uid="BackupPage_NoFolderSelected" VerticalAlignment="Center"/>
