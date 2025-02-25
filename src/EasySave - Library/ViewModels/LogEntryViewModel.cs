@@ -25,10 +25,10 @@ namespace EasySaveLibrary.ViewModels
             return _instance;
         }
 
-        public void WriteLog(string name, string fileSource, string fileTarget, long fileSize, double fileTransferTime)
+        public void WriteLog(string name, string fileSource, string fileTarget, long fileSize, double fileTransferTime, double encryptionTime)
         {
             LogService logService = LogService.GetLogServiceInstance();
-            logService.SaveLog(name, fileSource, fileTarget, fileSize, fileTransferTime);
+            logService.SaveLog(name, fileSource, fileTarget, fileSize, fileTransferTime, encryptionTime);
         }
         public string GetLogFormat()
         {

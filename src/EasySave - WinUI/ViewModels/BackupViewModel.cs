@@ -4,9 +4,10 @@ using EasySave___WinUI.Services;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 using System.Threading.Tasks;
-using EasySaveLibrary.Models;
 using Windows.ApplicationModel.Resources;
+using EasySave___WinUI.ViewModels;
 using EasySaveLibrary.ViewModels;
+using System.Diagnostics;
 
 namespace EasySave___WinUI.ViewModels {
 
@@ -58,8 +59,8 @@ namespace EasySave___WinUI.ViewModels {
             _currentBackupService.EncryptionKey = backupEncryptionKey;
 
             CurrentBackupState = BackupState.Running;
-            double elapsedTime = await _currentBackupService.RunBackup(name, source, destination, isFullBackup, textBlock);
-            _logEntryViewModel.WriteLog(name, source, destination, new DirectoryInfo(source).EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(fi => fi.Length), elapsedTime);
+            List<double> elapsedTimes = await _currentBackupService.RunBackup(name, source, destination, isFullBackup, textBlock);
+            _logEntryViewModel.WriteLog(name, source, destination, new DirectoryInfo(source).EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(fi => fi.Length), elapsedTimes[0], elapsedTimes[1]);
             CurrentBackupState = BackupState.Stopped;
         }
 

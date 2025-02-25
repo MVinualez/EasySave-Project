@@ -7,7 +7,6 @@ using EasySave___WinUI.Models;
 using Microsoft.UI.Xaml;
 using Windows.ApplicationModel.Resources;
 using Microsoft.UI.Xaml.Controls;
-using EasySave___WinUI.CryptoSoft;
 using System.Diagnostics;
 using EasySave___WinUI.ViewModels;
 
@@ -15,9 +14,12 @@ namespace EasySave___WinUI.Services {
     public abstract class BackupService {
         private readonly StateViewModel _stateViewModel;
         private readonly NotificationViewModel _notificationViewModel;
+        private readonly EncryptionViewModel _encryptionViewModel;
         private readonly ResourceLoader _resourceLoader;
         private volatile bool _isPaused = false;
         private volatile bool _isStopped = false;
+        private Stopwatch _copyStopwatch;
+        private Stopwatch _encryptionStopwatch;
 
         public XamlRoot XamlRoot { get; }
         public string EncryptionKey { get; set; }
@@ -27,7 +29,11 @@ namespace EasySave___WinUI.Services {
             EncryptionKey = string.Empty;
             _stateViewModel = StateViewModel.GetStateViewModelInstance(XamlRoot);
             _notificationViewModel = NotificationViewModel.GetNotificationViewModelInstance();
+            _encryptionViewModel = EncryptionViewModel.GetEncryptionViewModelInstance();
             _resourceLoader = new ResourceLoader();
+
+            _copyStopwatch = new Stopwatch();
+            _encryptionStopwatch = new Stopwatch();
         }
 
         public void PauseBackup() {
@@ -59,15 +65,15 @@ namespace EasySave___WinUI.Services {
             });
         }
 
-        public async Task<double> RunBackup(string name, string source, string destination, bool isFullBackup, TextBlock textBlock) {
-            Stopwatch stopwatch = Stopwatch.StartNew();
+        public async Task<List<double>> RunBackup(string name, string source, string destination, bool isFullBackup, TextBlock textBlock) {
+            _copyStopwatch.Start();
             try {
                 if (!Directory.Exists(source)) {
                     await _notificationViewModel.ShowPopupDialog(
                         _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
                         _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
                         string.Empty, "OK", XamlRoot);
-                    return 0;
+                    return new List<double> { 0 };
                 }
 
                 _stateViewModel.RegisterJobState(name);
@@ -77,8 +83,13 @@ namespace EasySave___WinUI.Services {
                 await CopyDirectoryReccursively(name, source, destination, isFullBackup, textBlock);
                 await CopyDirectoryReccursively(name, source, fullPathBackup, isFullBackup, textBlock);
 
-                var fileManager = new FileManager(destination, [".docx", ".txt"], EncryptionKey);
-                fileManager.Transform();
+                _copyStopwatch.Stop();
+                _encryptionStopwatch.Start();
+                
+                await _encryptionViewModel.EncryptFile(destination, new List<string> { ".pdf", ".docx", ".txt", ".mp4" }, EncryptionKey);
+                
+                _encryptionStopwatch.Stop();
+
                 _stateViewModel.CompleteJobState(name);
 
                 textBlock.DispatcherQueue.TryEnqueue(() => {
@@ -89,8 +100,7 @@ namespace EasySave___WinUI.Services {
                 Console.WriteLine($"❌ Erreur : {ex.Message}");
             }
 
-            stopwatch.Stop();
-            return stopwatch.Elapsed.TotalSeconds;
+            return new List<double> { _copyStopwatch.Elapsed.TotalSeconds, _encryptionStopwatch.Elapsed.TotalSeconds };
         }
 
         public async Task CopyDirectoryReccursively(string name, string source, string target, bool isFullBackup, TextBlock textBlock) {
@@ -103,7 +113,6 @@ namespace EasySave___WinUI.Services {
                 string fileName = Path.GetFileName(file);
                 string destFile = Path.Combine(target, fileName);
                 long fileSize = new FileInfo(file).Length;
-
                 await WaitForProcessToClose(textBlock);
 
                 while (_isPaused) {

@@ -15,8 +15,8 @@ namespace EasySaveLibrary.Models
         public double FileTransferTime { get; set; }
         public string Time { get; set; }
 
-        public LogEntryModel() { }
-        public LogEntryModel(string name, string fileSource, string fileTarget, long fileSize, double fileTransferTime)
+        public double EncryptionTime { get; set; }
+        public LogEntryModel(string name, string fileSource, string fileTarget, long fileSize, double fileTransferTime, double encryptionTime)
         {
             Name = name;
             FileSource = fileSource;
@@ -24,7 +24,7 @@ namespace EasySaveLibrary.Models
             FileSize = fileSize;
             FileTransferTime = fileTransferTime;
             Time = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+            EncryptionTime = encryptionTime;
         }
     }
-
 }

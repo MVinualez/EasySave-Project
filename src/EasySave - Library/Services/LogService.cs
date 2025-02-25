@@ -43,9 +43,9 @@ namespace EasySaveLibrary.Services
         // LogController method of the LogController class, which uses the Exists method from the System.IO.Directory class 
         // and takes the logDirectory variable as a parameter
         // Checks if the Logs folder exists, and creates it if not.
-        public void SaveLog(string name, string fileSource, string fileTarget, long fileSize, double fileTransferTime)
+        public void SaveLog(string name, string fileSource, string fileTarget, long fileSize, double fileTransferTime, double encryptionTime)
         {
-            LogEntryModel log = new LogEntryModel(name, fileSource, fileTarget, fileSize, fileTransferTime);
+            LogEntryModel log = new LogEntryModel(name, fileSource, fileTarget, fileSize, fileTransferTime, encryptionTime);
             string logFileName = $"{DateTime.Now:yyyy-MM-dd}.{(LogFormat == "JSON" ? "json" : "xml")}";
             string logFilePath = Path.Combine(fullPath, logFileName);
 
