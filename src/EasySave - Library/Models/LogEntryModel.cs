@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EasySaveLibrary.Models
 {
-    public class LogEntry
+    public class LogEntryModel
     {
         public string Name { get; set; }
         public string FileSource { get; set; }
@@ -16,7 +16,7 @@ namespace EasySaveLibrary.Models
         public string Time { get; set; }
 
         public double EncryptionTime { get; set; }
-        public LogEntry(string name, string fileSource, string fileTarget, long fileSize, double fileTransferTime, double encryptionTime)
+        public LogEntryModel(string name, string fileSource, string fileTarget, long fileSize, double fileTransferTime, double encryptionTime)
         {
             Name = name;
             FileSource = fileSource;

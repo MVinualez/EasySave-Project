@@ -16,7 +16,7 @@ namespace EasySave___WinUI.ViewModels
 
         private  EncryptionService _encryptionService;
 
-        private static EncryptionViewModel _instance;
+        private static EncryptionViewModel? _instance;
 
 
 
@@ -32,11 +32,14 @@ namespace EasySave___WinUI.ViewModels
             return _instance; }
 
 
-        public void EncryptFile(string path, List<string> allowedExtensions, string key)
+        public async Task EncryptFile(string path, List<string> allowedExtensions, string key)
         {
-            _encryptionService = EncryptionService.GetEncryptionServiceInstance(path, allowedExtensions, key);
+            await Task.Run(() => {
+                _encryptionService = EncryptionService.GetEncryptionServiceInstance(path, allowedExtensions, key);
 
-            _encryptionService.Transform(path, allowedExtensions ,key);
+                _encryptionService.Transform(path, allowedExtensions ,key);
+            });
+            
 
 
         }

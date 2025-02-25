@@ -221,7 +221,40 @@
   <data name="BackupPage_EncryptionKey.Text" xml:space="preserve">
     <value>Clef de chiffrement</value>
   </data>
-  <data name="BackupPage_BackupEncryptionFileTypeNotAllowed" xml:space="preserve">
-    <value>kk</value>
+  <data name="State_TaskAlreadyExists" xml:space="preserve">
+    <value>La tâche existe déjà</value>
+  </data>
+  <data name="State_TaskAlreadyExistsContent" xml:space="preserve">
+    <value>La tâche "{0}" existe déjà dans l'état.</value>
+  </data>
+  <data name="State_JobDoesntExists" xml:space="preserve">
+    <value>La tâche n'existe pas</value>
+  </data>
+  <data name="State_JobDoesntExistsContent" xml:space="preserve">
+    <value>La tâche "{0}" n'existe pas dans l'état.</value>
+  </data>
+  <data name="State_FileAdded" xml:space="preserve">
+    <value>Le fichier "{0}" a été ajouté à la tâche "{1}".</value>
+  </data>
+  <data name="State_FileTransferInProgress" xml:space="preserve">
+    <value>Transfert du fichier "{0}" en cours ({1} octets).</value>
+  </data>
+  <data name="State_NoPendingFiles" xml:space="preserve">
+    <value>Il n'y a pas de fichiers en attente pour la tâche "{0}".</value>
+  </data>
+  <data name="State_JobCompleted" xml:space="preserve">
+    <value>La tâche "{0}" est terminée.</value>
+  </data>
+  <data name="State_JobNotFinished" xml:space="preserve">
+    <value>La tâche "{0}" n'est pas encore terminée. {1} fichiers restants.</value>
+  </data>
+  <data name="Backup_OfficeCanceled" xml:space="preserve">
+    <value>Sauvegarde annulée en raison de l'exécution d'applications Office.</value>
+  </data>
+  <data name="BackupPage_BackupPaused" xml:space="preserve">
+    <value>🕰️ Sauvegarde en pause...</value>
+  </data>
+  <data name="BackupPage_BackupResumed" xml:space="preserve">
+    <value>⏰ Reprise de la sauvegarde</value>
   </data>
 </root>

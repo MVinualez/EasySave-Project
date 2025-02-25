@@ -1,9 +1,11 @@
 ﻿using System.Diagnostics;
-using easysave_project.Models;
+using EasySave___WinUI.Models;
 using System.Text;
 using EasySave___WinUI.ViewModels;
 using static System.Net.Mime.MediaTypeNames;
 using EasySave___WinUI.ViewModels;
+using Windows.UI.StartScreen;
+using System.Diagnostics.Eventing.Reader;
 
 namespace EasySave___WinUI.Services;
 
@@ -17,7 +19,7 @@ public class EncryptionService
     private List<string> AllowedExtensions { get; }
     private string Key { get; }
 
-    private static EncryptionService _instance;
+    private static EncryptionService? _instance;
 
 
     private EncryptionService(string path, List<string> allowedExtensions, string key)
@@ -64,10 +66,15 @@ public class EncryptionService
     private void TransformFile(string filePath)
     {
         string fileExtension = Path.GetExtension(filePath);
+        long fileSize = new FileInfo(filePath).Length;
         if (!AllowedExtensions.Contains(fileExtension, StringComparer.OrdinalIgnoreCase))
         {
             Console.WriteLine($"⛔ Le fichier {filePath} n'a pas une extension autorisée ({fileExtension}), chiffrement annulé.");
             return;
+        }
+
+        if(fileSize >= 2000000000) {
+            return; 
         }
 
         Console.WriteLine($"🔐 Début du chiffrement de {filePath}...");
@@ -97,7 +104,11 @@ public class EncryptionService
         var result = new byte[fileBytes.Count];
         for (var i = 0; i < fileBytes.Count; i++)
         {
-            result[i] = (byte)(fileBytes[i] ^ keyBytes[i % keyBytes.Count]);
+            if(keyBytes.Count != 0) {
+                result[i] = (byte)(fileBytes[i] ^ keyBytes[i % keyBytes.Count]);
+            } else {
+                result[i] = fileBytes[i];
+            }
         }
         return result;
     }
