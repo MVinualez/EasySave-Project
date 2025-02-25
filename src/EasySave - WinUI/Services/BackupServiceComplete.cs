@@ -11,7 +11,7 @@ namespace EasySave___WinUI.Services {
         }
 
         public static BackupServiceComplete GetBackupServiceCompleteInstance(XamlRoot xamlRoot) {
-            _instance ??= new BackupServiceComplete(xamlRoot);
+            _instance = new BackupServiceComplete(xamlRoot);
             return _instance;
         }
 
