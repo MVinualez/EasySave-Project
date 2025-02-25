@@ -14,6 +14,8 @@ namespace EasySaveLibrary.Models
         public long FileSize { get; set; }
         public double FileTransferTime { get; set; }
         public string Time { get; set; }
+
+        public LogEntryModel() { }
         public LogEntryModel(string name, string fileSource, string fileTarget, long fileSize, double fileTransferTime)
         {
             Name = name;

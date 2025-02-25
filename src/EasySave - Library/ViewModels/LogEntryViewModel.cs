@@ -10,10 +10,13 @@ namespace EasySaveLibrary.ViewModels
     public class LogEntryViewModel
     {
         private static LogEntryViewModel? _instance;
+        private LogService logService;
+        private string _logFormat;
+
 
         private LogEntryViewModel()
         {
-
+            logService = LogService.GetLogServiceInstance();
         }
 
         public static LogEntryViewModel GetLogEntryViewModelInstance()
@@ -26,6 +29,20 @@ namespace EasySaveLibrary.ViewModels
         {
             LogService logService = LogService.GetLogServiceInstance();
             logService.SaveLog(name, fileSource, fileTarget, fileSize, fileTransferTime);
+        }
+        public string GetLogFormat()
+        {
+            return _logFormat;
+        }
+
+        public void SetLogFormat(string format)
+        {
+            if (format == "JSON" || format == "XML")    
+            {
+                _logFormat = format;
+            }
+
+            logService.LogFormat = _logFormat;
         }
 
     }
