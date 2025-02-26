@@ -27,7 +27,7 @@ public partial class ParallelBackupViewModel : ObservableRecipient {
         LoadBackups();
     }
 
-    private async void LoadBackups() {
+    private async Task LoadBackups() {
         var backups = await _backupParallelService.LoadBackupsAsync();
         SavedBackups.Clear();
         foreach (var job in backups)
