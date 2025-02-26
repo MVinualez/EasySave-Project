@@ -5,36 +5,23 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EasySave___WinUI.Models;
 using EasySave___WinUI.Services;
-using EasySaveLibrary.ViewModels;
 using Microsoft.UI.Xaml.Controls;
 
 namespace EasySave___WinUI.ViewModels;
 
 public partial class ParallelBackupViewModel : ObservableRecipient {
     private readonly BackupParallelService _backupParallelService;
-    private readonly BackupViewModel _backupViewModel;
 
     public ObservableCollection<BackupJobInfoModel> SavedBackups { get; }
 
-    public ICommand RunBackupCommand { get; }
-    public ICommand PauseBackupCommand { get; }
-    public ICommand ResumeBackupCommand { get; }
-    public ICommand StopBackupCommand { get; }
     public ICommand AddBackupCommand { get; }
 
     [ObservableProperty]
-    private string backupStatus = "État : Stoppé";
+    private string backupStatus = "Aucune sauvegarde en cours";
 
     public ParallelBackupViewModel() {
         _backupParallelService = new BackupParallelService();
-        _backupViewModel = BackupViewModel.GetBackupViewModelInstance(null);
-
         SavedBackups = new ObservableCollection<BackupJobInfoModel>();
-
-        RunBackupCommand = new RelayCommand<BackupJobInfoModel>(async job => await RunBackup(job));
-        PauseBackupCommand = new RelayCommand(PauseBackup);
-        ResumeBackupCommand = new RelayCommand(ResumeBackup);
-        StopBackupCommand = new RelayCommand(StopBackup);
         AddBackupCommand = new RelayCommand(async () => await AddBackup());
 
         LoadBackups();
@@ -45,36 +32,6 @@ public partial class ParallelBackupViewModel : ObservableRecipient {
         SavedBackups.Clear();
         foreach (var job in backups)
             SavedBackups.Add(job);
-    }
-
-    private async Task RunBackup(BackupJobInfoModel job) {
-        if (_backupViewModel.CurrentBackupState == BackupState.Running) return;
-
-        TextBlock textBlock = new TextBlock();
-        await _backupViewModel.StartBackup(job.Name, job.Source, job.Destination, true, "", textBlock);
-
-        BackupStatus = "État : En cours...";
-    }
-
-    private void PauseBackup() {
-        if (_backupViewModel.CurrentBackupState == BackupState.Running) {
-            _backupViewModel.PauseBackup();
-            BackupStatus = "État : En pause";
-        }
-    }
-
-    private void ResumeBackup() {
-        if (_backupViewModel.CurrentBackupState == BackupState.Paused) {
-            _backupViewModel.ResumeBackup();
-            BackupStatus = "État : En cours...";
-        }
-    }
-
-    private void StopBackup() {
-        if (_backupViewModel.CurrentBackupState != BackupState.Stopped) {
-            _backupViewModel.StopBackup();
-            BackupStatus = "État : Stoppé";
-        }
     }
 
     private async Task AddBackup() {

@@ -24,16 +24,17 @@
                             <TextBlock Text="{x:Bind Source}" FontSize="14" Foreground="Gray"/>
                             <TextBlock Text="{x:Bind Destination}" FontSize="14" Foreground="Gray"/>
 
-                            <Button Content="▶ Démarrer" Command="{Binding DataContext.RunBackupCommand, ElementName=PageRoot}" CommandParameter="{Binding}"/>
-                            <Button Content="⏸ Pause" Command="{Binding DataContext.PauseBackupCommand, ElementName=PageRoot}" CommandParameter="{Binding}"/>
-                            <Button Content="⏯ Reprendre" Command="{Binding DataContext.ResumeBackupCommand, ElementName=PageRoot}" CommandParameter="{Binding}"/>
-                            <Button Content="⏹ Stop" Command="{Binding DataContext.StopBackupCommand, ElementName=PageRoot}" CommandParameter="{Binding}"/>
-
-                            <TextBlock Text="{Binding DataContext.BackupStatus, ElementName=PageRoot}" FontSize="14" Foreground="Blue"/>
+                            <Button Content="▶ Démarrer" Click="OnRunBackup" Tag="{Binding}"/>
+                            <Button Content="⏸ Pause" Click="OnPauseBackup"/>
+                            <Button Content="⏯ Reprendre" Click="OnResumeBackup"/>
+                            <Button Content="⏹ Stop" Click="OnStopBackup"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
+
+            <TextBlock Text="{Binding BackupStatus}" FontSize="16" Foreground="Blue" Margin="0,10,0,0"/>
+            <TextBlock x:Name="ProgressTextBox" Grid.Row="6" Grid.Column="1" Margin="0,30,0,5"/>
         </StackPanel>
     </Grid>
 </Page>
