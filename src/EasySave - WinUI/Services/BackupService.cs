@@ -69,11 +69,11 @@ namespace EasySave___WinUI.Services {
             _copyStopwatch.Start();
             try {
                 if (!Directory.Exists(source)) {
-                    await _notificationViewModel.ShowPopupDialog(
-                        _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
-                        _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
-                        string.Empty, "OK", XamlRoot);
-                    return new List<double> { 0 };
+                    //await _notificationViewModel.ShowPopupDialog(
+                    //    _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
+                    //    _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
+                    //    string.Empty, "OK", XamlRoot);
+                    //return new List<double> { 0 };
                 }
 
                 _stateViewModel.RegisterJobState(name);

@@ -67,7 +67,7 @@ namespace EasySave___WinUI.Services {
                 );
                 SaveState(states);
             } else {
-                _notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_TaskAlreadyExists"), string.Format(_resourceLoader.GetString("State_TaskAlreadyExistsContent"), jobName), string.Empty, "OK", _xamlRoot);
+                //_notificationViewModel?.ShowPopupDialog(_resourceLoader.GetString("State_TaskAlreadyExists"), string.Format(_resourceLoader.GetString("State_TaskAlreadyExistsContent"), jobName), string.Empty, "OK", _xamlRoot);
             }
         }
 

@@ -242,4 +242,7 @@
   <data name="BackupPage_BackupResumed" xml:space="preserve">
     <value>⏰ Backup Resumed</value>
   </data>
+  <data name="Shell_ParallelBackup.Content" xml:space="preserve">
+    <value>ParallelBackup</value>
+  </data>
 </root>
