@@ -64,7 +64,7 @@ namespace EasySave___WinUI.Services {
                 textBlock.Text = _resourceLoader.GetString("BackupPage_BackupResumed");
             });
         }
-
+      
         public async Task<List<double>> RunBackup(string name, string source, string destination, bool isFullBackup, TextBlock textBlock)
     {
         _copyStopwatch.Start();
@@ -78,7 +78,7 @@ namespace EasySave___WinUI.Services {
                     string.Empty, "OK", XamlRoot);
                 return new List<double> { 0 };
             }
-
+          
             _stateViewModel.RegisterJobState(name);
             string fullPathBackup = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Backup");
             Directory.CreateDirectory(fullPathBackup);
