@@ -33,6 +33,10 @@ namespace EasySave___WinUI.ViewModels {
 
         public BackupState CurrentBackupState { get; private set; } = BackupState.Stopped;
 
+        public BackupViewModel()
+        {
+        }
+
         private BackupViewModel(XamlRoot xamlRoot) {
             _socketServer = new BackupSocketServer();
             _ = _socketServer.StartServer();

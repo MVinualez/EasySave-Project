@@ -72,8 +72,15 @@ public sealed partial class SettingsPage : Page
             logEntryViewModel.SetLogFormat("JSON");
         }
 
-        ExtensionsListView.SelectedItems.Clear();
+        List<object> tempList = new List<object>();
         foreach (var ext in ViewModel.SelectedExtensions)
+        {
+            tempList.Add(ext);
+        }
+
+        ExtensionsListView.SelectedItems.Clear();
+
+        foreach (var ext in tempList)
         {
             ExtensionsListView.SelectedItems.Add(ext);
         }

@@ -11,7 +11,8 @@
         <helpers:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
     </Page.Resources>
     <Grid>
-        <StackPanel
+        <ScrollViewer VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel
             x:Name="ContentArea">
             <TextBlock x:Uid="Settings_Personalization" Style="{ThemeResource SubtitleTextBlockStyle}" />
             <StackPanel Margin="{StaticResource SmallTopBottomMargin}">
@@ -87,5 +88,6 @@
                 <TextBlock Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}" Style="{ThemeResource BodyTextBlockStyle}"/>
             </StackPanel>
         </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>
