@@ -20,6 +20,12 @@ namespace EasySave___WinUI.Services {
         private volatile bool _isStopped = false;
         private Stopwatch _copyStopwatch;
         private Stopwatch _encryptionStopwatch;
+        /// <summary>
+        private readonly List<string> priorityExtensions = new List<string> {".iso"};
+        private readonly int maxParallelSizeKb = 50000; // Exemple de valeur paramétrable
+        private volatile bool largeFileInProgress = false;
+        /// </summary>
+        
 
         public XamlRoot XamlRoot { get; }
         public string EncryptionKey { get; set; }
@@ -108,27 +114,58 @@ namespace EasySave___WinUI.Services {
         return new List<double> { _copyStopwatch.Elapsed.TotalSeconds, _encryptionStopwatch.Elapsed.TotalSeconds };
     }
 
-        public async Task CopyDirectoryReccursively(string name, string source, string target, bool isFullBackup, TextBlock textBlock) {
-            foreach (string dir in Directory.GetDirectories(source, "*", SearchOption.AllDirectories)) {
+        public async Task CopyDirectoryReccursively(string name, string source, string target, bool isFullBackup, TextBlock textBlock)
+        {
+            foreach (string dir in Directory.GetDirectories(source, "*", SearchOption.AllDirectories))
+            {
                 string targetSubDir = dir.Replace(source, target);
                 Directory.CreateDirectory(targetSubDir);
             }
 
-            foreach (string file in Directory.GetFiles(source, "*.*", SearchOption.AllDirectories)) {
+            //////////
+            var files = Directory.GetFiles(source, "*.*", SearchOption.AllDirectories);
+            var priorityFiles = files.Where(f => priorityExtensions.Contains(Path.GetExtension(f))).ToList();
+            var nonPriorityFiles = files.Except(priorityFiles).ToList();
+            //////////
+
+
+            foreach (string file in priorityFiles.Concat(nonPriorityFiles))
+            {
                 string fileName = Path.GetFileName(file);
                 string destFile = Path.Combine(target, fileName);
                 long fileSize = new FileInfo(file).Length;
+                long fileSizeKb = fileSize / 1024;
+
                 await WaitForProcessToClose(textBlock);
 
-                while (_isPaused) {
+                while (_isPaused)
+                {
                     await Task.Delay(500);
                 }
 
                 if (_isStopped) return;
 
-                await Task.Run(() => {
-                    if (ShouldCopyFile(file, destFile)) {
-                        textBlock.DispatcherQueue.TryEnqueue(() => {
+                ///
+                if (fileSizeKb > maxParallelSizeKb)
+                {
+                    lock (this)
+                    {
+                        while (largeFileInProgress) // Attendre la fin du transfert en cours
+                        {
+                            Task.Delay(500).Wait();
+                        }
+                        largeFileInProgress = true; // Marquer qu'un fichier volumineux est en cours
+                    }
+                }
+                ///
+
+
+                await Task.Run(() =>
+                {
+                    if (ShouldCopyFile(file, destFile))
+                    {
+                        textBlock.DispatcherQueue.TryEnqueue(() =>
+                        {
                             textBlock.Text = string.Format(_resourceLoader.GetString("BackupPage_BackupInProgress"), fileName);
                         });
 
@@ -137,9 +174,16 @@ namespace EasySave___WinUI.Services {
                         _stateViewModel.MarkFileAsProcessed(name, file, fileSize);
                     }
                 });
+                if (fileSizeKb > maxParallelSizeKb)
+                {
+                    lock (this)
+                    {
+                        largeFileInProgress = false;
+                    }
+                }
             }
         }
-
+                
         protected abstract bool ShouldCopyFile(string sourceFile, string destFile);
     }
 }
