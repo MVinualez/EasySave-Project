@@ -257,4 +257,7 @@
   <data name="BackupPage_BackupResumed" xml:space="preserve">
     <value>⏰ Reprise de la sauvegarde</value>
   </data>
+  <data name="Shell_ParallelBackup.Content" xml:space="preserve">
+    <value>Sauvegarde Parallèle</value>
+  </data>
 </root>

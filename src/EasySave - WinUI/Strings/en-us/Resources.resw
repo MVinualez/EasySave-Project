@@ -243,6 +243,6 @@
     <value>⏰ Backup Resumed</value>
   </data>
   <data name="Shell_ParallelBackup.Content" xml:space="preserve">
-    <value>ParallelBackup</value>
+    <value>Parallel Backup</value>
   </data>
 </root>
