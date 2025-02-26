@@ -26,6 +26,9 @@ namespace EasySave___WinUI.ViewModels {
         private BackupService? _currentBackupService;
         private BackupSocketServer? _socketServer;
 
+        private readonly List<Thread> _backupThreads = new();
+        private readonly List<BackupService> _activeBackupServices = new();
+
         public BackupState CurrentBackupState { get; private set; } = BackupState.Stopped;
 
         private BackupViewModel(XamlRoot xamlRoot) {
@@ -53,15 +56,23 @@ namespace EasySave___WinUI.ViewModels {
         }
 
         public async Task StartBackup(string name, string source, string destination, bool isFullBackup, string backupEncryptionKey, TextBlock textBlock) {
-            if (CurrentBackupState == BackupState.Running) return;
+            var backupService = GetBackupServiceInstance(isFullBackup);
+            backupService.EncryptionKey = backupEncryptionKey;
 
-            _currentBackupService = GetBackupServiceInstance(isFullBackup);
-            _currentBackupService.EncryptionKey = backupEncryptionKey;
+            _activeBackupServices.Add(backupService);
 
-            CurrentBackupState = BackupState.Running;
-            List<double> elapsedTimes = await _currentBackupService.RunBackup(name, source, destination, isFullBackup, textBlock);
-            _logEntryViewModel.WriteLog(name, source, destination, new DirectoryInfo(source).EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(fi => fi.Length), elapsedTimes[0], elapsedTimes[1]);
-            CurrentBackupState = BackupState.Stopped;
+            Thread backupThread = new Thread(async () =>
+            {
+                try {
+                    List<double> elapsedTimes = await backupService.RunBackup(name, source, destination, isFullBackup, textBlock);
+                    _logEntryViewModel.WriteLog(name, source, destination, new DirectoryInfo(source).EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(fi => fi.Length), elapsedTimes[0], elapsedTimes[1]);
+                } finally {
+                    _activeBackupServices.Remove(backupService);
+                }
+            });
+
+            _backupThreads.Add(backupThread);
+            backupThread.Start();
         }
 
         public void PauseBackup() {

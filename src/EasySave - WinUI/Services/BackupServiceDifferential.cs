@@ -11,7 +11,7 @@ namespace EasySave___WinUI.Services {
         }
 
         public static BackupServiceDifferential GetBackupServiceDifferentialInstance(XamlRoot xamlRoot) {
-            _instance ??= new BackupServiceDifferential(xamlRoot);
+            _instance = new BackupServiceDifferential(xamlRoot);
             return _instance;
         }
 
