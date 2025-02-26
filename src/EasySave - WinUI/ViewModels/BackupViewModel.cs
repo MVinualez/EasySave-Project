@@ -28,6 +28,8 @@ namespace EasySave___WinUI.ViewModels {
 
         private readonly List<Thread> _backupThreads = new();
         private readonly List<BackupService> _activeBackupServices = new();
+        public List<string> priorityExtensions { get; private set; } = new List<string> { ".iso" };
+        public int maxParallelSizeKb { get; private set; } = 50000;
 
         public BackupState CurrentBackupState { get; private set; } = BackupState.Stopped;
 
@@ -75,6 +77,8 @@ namespace EasySave___WinUI.ViewModels {
             backupThread.Start();
         }
 
+
+
         public void PauseBackup() {
             if (_currentBackupService != null && CurrentBackupState == BackupState.Running) {
                 _currentBackupService.PauseBackup();
@@ -95,5 +99,15 @@ namespace EasySave___WinUI.ViewModels {
                 CurrentBackupState = BackupState.Stopped;
             }
         }
+        public void SetPriorityExtension(List<string> extensions)
+        {
+            priorityExtensions = new List<string>(extensions);
+        }
+
+        public void SetMaxParallelSizeKb(int sizeKb)
+        {
+            maxParallelSizeKb = sizeKb;
+        }
+
     }
 }

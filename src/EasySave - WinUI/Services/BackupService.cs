@@ -20,13 +20,9 @@ namespace EasySave___WinUI.Services {
         private volatile bool _isStopped = false;
         private Stopwatch _copyStopwatch;
         private Stopwatch _encryptionStopwatch;
-        /// <summary>
-        private readonly List<string> priorityExtensions = new List<string> {".iso"};
-        private readonly int maxParallelSizeKb = 50000; // Exemple de valeur paramétrable
-        private volatile bool largeFileInProgress = false;
-        /// </summary>
-        
-
+        public List<string> priorityExtensions { get; private set;  } = new List<string> { ".iso" };
+        public int maxParallelSizeKb { get; private set; } = 50000; // Exemple de valeur paramétrable
+        private volatile bool largeFileInProgress = false;        
         public XamlRoot XamlRoot { get; }
         public string EncryptionKey { get; set; }
 
@@ -40,6 +36,16 @@ namespace EasySave___WinUI.Services {
 
             _copyStopwatch = new Stopwatch();
             _encryptionStopwatch = new Stopwatch();
+        }
+
+        public void SetPriorityExtension(List<string> extensions)
+        {
+            priorityExtensions = new List<string>(extensions);
+        }
+
+        public void SetMaxParallelSizeKb(int sizeKb)
+        {
+            maxParallelSizeKb = sizeKb;
         }
 
         public void PauseBackup() {
@@ -122,12 +128,10 @@ namespace EasySave___WinUI.Services {
                 Directory.CreateDirectory(targetSubDir);
             }
 
-            //////////
             var files = Directory.GetFiles(source, "*.*", SearchOption.AllDirectories);
             var priorityFiles = files.Where(f => priorityExtensions.Contains(Path.GetExtension(f))).ToList();
             var nonPriorityFiles = files.Except(priorityFiles).ToList();
-            //////////
-
+           
 
             foreach (string file in priorityFiles.Concat(nonPriorityFiles))
             {

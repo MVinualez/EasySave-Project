@@ -1,8 +1,10 @@
-﻿using EasySave___WinUI.ViewModels;
+﻿using EasySave___WinUI.Services;
+using EasySave___WinUI.ViewModels;
 using EasySaveLibrary.Services;
 using EasySaveLibrary.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using Windows.Globalization;
 using Windows.Storage;
@@ -13,16 +15,17 @@ namespace EasySave___WinUI.Views;
 public sealed partial class SettingsPage : Page
 {
     private LogEntryViewModel logEntryViewModel = LogEntryViewModel.GetLogEntryViewModelInstance();
-    public SettingsViewModel ViewModel
+    public SettingsViewModel ViewModel 
     {
         get;
     }
-
+   
     public SettingsPage()
     {
         ViewModel = App.GetService<SettingsViewModel>();
         InitializeComponent();
         this.Loaded += SettingsPage_Loaded;
+        ExtensionsListView.SelectionChanged += ExtensionsListView_SelectionChanged;
     }
 
     private void LanguageSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -42,10 +45,20 @@ public sealed partial class SettingsPage : Page
         }
     }
 
-    private void SettingsPage_Loaded(object sender, RoutedEventArgs e)
+    private void ExtensionsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        // Ensure JSON is selected if the user has not changed the format
+        ViewModel.SelectedExtensions.Clear();
+        foreach (var item in ExtensionsListView.SelectedItems)
+        {
+            ViewModel.SelectedExtensions.Add(item.ToString());
+        }
+    }
+
+
+        private void SettingsPage_Loaded(object sender, RoutedEventArgs e)
+    {
         string currentFormat = logEntryViewModel.GetLogFormat();
+        
 
         if (currentFormat == "JSON" || currentFormat == "XML")
         {
@@ -58,6 +71,13 @@ public sealed partial class SettingsPage : Page
             JsonRadioButton.IsChecked = true;
             logEntryViewModel.SetLogFormat("JSON");
         }
+
+        ExtensionsListView.SelectedItems.Clear();
+        foreach (var ext in ViewModel.SelectedExtensions)
+        {
+            ExtensionsListView.SelectedItems.Add(ext);
+        }
+
     }
 
 
