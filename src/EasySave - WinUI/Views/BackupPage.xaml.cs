@@ -60,7 +60,7 @@ public sealed partial class BackupPage : Page
         var destinationPath = DestinationPathText?.Text;
         var encryptionKey = BackupEncryptionKeyTextBox?.Text;
 
-        _backupViewModel.StartBackup(backupName, sourcePath, destinationPath, isFullBackup, encryptionKey, ProgressTextBox);
+        await _backupViewModel.StartBackup(backupName, sourcePath, destinationPath, isFullBackup, encryptionKey, ProgressTextBox);
     }
 
     private void PauseBackup_Click(object sender, RoutedEventArgs e) {

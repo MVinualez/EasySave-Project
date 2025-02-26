@@ -64,44 +64,49 @@ namespace EasySave___WinUI.Services {
                 textBlock.Text = _resourceLoader.GetString("BackupPage_BackupResumed");
             });
         }
-
-        public async Task<List<double>> RunBackup(string name, string source, string destination, bool isFullBackup, TextBlock textBlock) {
-            _copyStopwatch.Start();
-            try {
-                if (!Directory.Exists(source)) {
-                    await _notificationViewModel.ShowPopupDialog(
-                        _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
-                        _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
-                        string.Empty, "OK", XamlRoot);
-                    return new List<double> { 0 };
-                }
-
-                _stateViewModel.RegisterJobState(name);
-                string fullPathBackup = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Backup");
-                Directory.CreateDirectory(fullPathBackup);
-
-                await CopyDirectoryReccursively(name, source, destination, isFullBackup, textBlock);
-                await CopyDirectoryReccursively(name, source, fullPathBackup, isFullBackup, textBlock);
-
-                _copyStopwatch.Stop();
-                _encryptionStopwatch.Start();
-                
-                await _encryptionViewModel.EncryptFile(destination, new List<string> { ".pdf", ".docx", ".txt", ".mp4" }, EncryptionKey);
-                
-                _encryptionStopwatch.Stop();
-
-                _stateViewModel.CompleteJobState(name);
-
-                textBlock.DispatcherQueue.TryEnqueue(() => {
-                    textBlock.Text = _resourceLoader.GetString("BackupPage_BackupFinished");
-                });
-
-            } catch (Exception ex) {
-                Console.WriteLine($"❌ Erreur : {ex.Message}");
+      
+        public async Task<List<double>> RunBackup(string name, string source, string destination, bool isFullBackup, TextBlock textBlock)
+    {
+        _copyStopwatch.Start();
+        try
+        {
+            if (!Directory.Exists(source))
+            {
+                await _notificationViewModel.ShowPopupDialog(
+                    _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
+                    _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
+                    string.Empty, "OK", XamlRoot);
+                return new List<double> { 0 };
             }
+          
+            _stateViewModel.RegisterJobState(name);
+            string fullPathBackup = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Backup");
+            Directory.CreateDirectory(fullPathBackup);
 
-            return new List<double> { _copyStopwatch.Elapsed.TotalSeconds, _encryptionStopwatch.Elapsed.TotalSeconds };
+            await CopyDirectoryReccursively(name, source, destination, isFullBackup, textBlock);
+            await CopyDirectoryReccursively(name, source, fullPathBackup, isFullBackup, textBlock);
+
+            _copyStopwatch.Stop();
+            _encryptionStopwatch.Start();
+
+            await _encryptionViewModel.EncryptFile(destination, new List<string> { ".pdf", ".docx", ".txt", ".mp4" }, EncryptionKey);
+
+            _encryptionStopwatch.Stop();
+
+            _stateViewModel.CompleteJobState(name);
+
+            textBlock.DispatcherQueue.TryEnqueue(() =>
+            {
+                textBlock.Text = _resourceLoader.GetString("BackupPage_BackupFinished");
+            });
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Erreur : {ex.Message}");
+        }
+
+        return new List<double> { _copyStopwatch.Elapsed.TotalSeconds, _encryptionStopwatch.Elapsed.TotalSeconds };
+    }
 
         public async Task CopyDirectoryReccursively(string name, string source, string target, bool isFullBackup, TextBlock textBlock) {
             foreach (string dir in Directory.GetDirectories(source, "*", SearchOption.AllDirectories)) {

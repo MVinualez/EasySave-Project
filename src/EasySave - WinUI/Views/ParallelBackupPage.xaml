@@ -1,0 +1,40 @@
+﻿<Page
+    x:Class="EasySave___WinUI.Views.ParallelBackupPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:xaml="using:Microsoft.UI.Xaml"
+    xmlns:models="using:EasySave___WinUI.Models"
+    xmlns:viewModels="using:EasySave___WinUI.ViewModels"
+    mc:Ignorable="d"
+    x:Name="PageRoot">
+
+    <Grid Padding="20">
+        <StackPanel>
+            <TextBlock Text="Saved Backups" FontSize="24" Margin="0,0,0,10"/>
+
+            <Button Content="Ajouter une sauvegarde" Command="{Binding AddBackupCommand}" Margin="0,0,0,10"/>
+
+            <ListView ItemsSource="{Binding SavedBackups, Mode=OneWay}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="models:BackupJobInfoModel">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="{x:Bind Name}" FontSize="18"/>
+                            <TextBlock Text="{x:Bind Source}" FontSize="14" Foreground="Gray"/>
+                            <TextBlock Text="{x:Bind Destination}" FontSize="14" Foreground="Gray"/>
+
+                            <Button Content="▶ Démarrer" Click="OnRunBackup" Tag="{Binding}"/>
+                            <Button Content="⏸ Pause" Click="OnPauseBackup"/>
+                            <Button Content="⏯ Reprendre" Click="OnResumeBackup"/>
+                            <Button Content="⏹ Stop" Click="OnStopBackup"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <TextBlock Text="{Binding BackupStatus}" FontSize="16" Foreground="Blue" Margin="0,10,0,0"/>
+            <TextBlock x:Name="ProgressTextBox" Grid.Row="6" Grid.Column="1" Margin="0,30,0,5"/>
+        </StackPanel>
+    </Grid>
+</Page>
