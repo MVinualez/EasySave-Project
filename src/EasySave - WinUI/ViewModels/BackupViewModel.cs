@@ -71,7 +71,6 @@ namespace EasySave___WinUI.ViewModels {
             Thread backupThread = new Thread(async () =>
             {
                 try {
-                    Debug.WriteLine(backupService.priorityExtensions.ToString());
                     List<double> elapsedTimes = await backupService.RunBackup(name, source, destination, isFullBackup, textBlock);
                     _logEntryViewModel.WriteLog(name, source, destination, new DirectoryInfo(source).EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(fi => fi.Length), elapsedTimes[0], elapsedTimes[1]);
                 } finally {
