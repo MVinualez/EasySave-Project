@@ -75,25 +75,27 @@ namespace EasySave___WinUI.ViewModels {
             backupThread.Start();
         }
 
-        public void PauseBackup() {
-            if (_currentBackupService != null && CurrentBackupState == BackupState.Running) {
-                _currentBackupService.PauseBackup();
-                CurrentBackupState = BackupState.Paused;
+        public void PauseBackup(string jobName) {
+            var backupService = _activeBackupServices.FirstOrDefault(b => b.JobName == jobName);
+            if (backupService != null) {
+                backupService.PauseBackup();
             }
         }
 
-        public void ResumeBackup() {
-            if (_currentBackupService != null && CurrentBackupState == BackupState.Paused) {
-                _currentBackupService.ResumeBackup();
-                CurrentBackupState = BackupState.Running;
+        public void ResumeBackup(string jobName) {
+            var backupService = _activeBackupServices.FirstOrDefault(b => b.JobName == jobName);
+            if (backupService != null) {
+                backupService.ResumeBackup();
             }
         }
 
-        public void StopBackup() {
-            if (_currentBackupService != null && CurrentBackupState != BackupState.Stopped) {
-                _currentBackupService.StopBackup();
-                CurrentBackupState = BackupState.Stopped;
+        public void StopBackup(string jobName) {
+            var backupService = _activeBackupServices.FirstOrDefault(b => b.JobName == jobName);
+            if (backupService != null) {
+                backupService.StopBackup();
+                _activeBackupServices.Remove(backupService);
             }
         }
+
     }
 }
