@@ -28,10 +28,10 @@ namespace EasySave___WinUI.ViewModels {
 
         private readonly List<Thread> _backupThreads = new();
         private readonly List<BackupService> _activeBackupServices = new();
-        public List<string> priorityExtensions { get; private set; } = new List<string> { ".iso" };
+        public List<string> priorityExtensions { get; set; } = new List<string> { ".iso" };
         public int maxParallelSizeKb { get; private set; } = 50000;
 
-        public BackupState CurrentBackupState { get; private set; } = BackupState.Stopped;
+        public BackupState CurrentBackupState { get; set; } = BackupState.Stopped;
 
         public BackupViewModel()
         {
@@ -63,6 +63,7 @@ namespace EasySave___WinUI.ViewModels {
 
         public async Task StartBackup(string name, string source, string destination, bool isFullBackup, string backupEncryptionKey, TextBlock textBlock) {
             var backupService = GetBackupServiceInstance(isFullBackup);
+            backupService.priorityExtensions = priorityExtensions;
             backupService.EncryptionKey = backupEncryptionKey;
 
             _activeBackupServices.Add(backupService);
@@ -70,6 +71,7 @@ namespace EasySave___WinUI.ViewModels {
             Thread backupThread = new Thread(async () =>
             {
                 try {
+                    Debug.WriteLine(backupService.priorityExtensions.ToString());
                     List<double> elapsedTimes = await backupService.RunBackup(name, source, destination, isFullBackup, textBlock);
                     _logEntryViewModel.WriteLog(name, source, destination, new DirectoryInfo(source).EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(fi => fi.Length), elapsedTimes[0], elapsedTimes[1]);
                 } finally {

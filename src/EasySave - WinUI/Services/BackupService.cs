@@ -20,7 +20,7 @@ namespace EasySave___WinUI.Services {
         private volatile bool _isStopped = false;
         private Stopwatch _copyStopwatch;
         private Stopwatch _encryptionStopwatch;
-        public List<string> priorityExtensions { get; private set;  } = new List<string> { ".iso" };
+        public List<string> priorityExtensions { get; set;  } = new List<string> { ".iso" };
         public int maxParallelSizeKb { get; private set; } = 50000; // Exemple de valeur paramétrable
         private volatile bool largeFileInProgress = false;        
         public XamlRoot XamlRoot { get; }
@@ -78,47 +78,47 @@ namespace EasySave___WinUI.Services {
         }
       
         public async Task<List<double>> RunBackup(string name, string source, string destination, bool isFullBackup, TextBlock textBlock)
-    {
-        _copyStopwatch.Start();
-        try
         {
-            if (!Directory.Exists(source))
+            _copyStopwatch.Start();
+            try
             {
-                await _notificationViewModel.ShowPopupDialog(
-                    _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
-                    _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
-                    string.Empty, "OK", XamlRoot);
-                return new List<double> { 0 };
-            }
+                if (!Directory.Exists(source))
+                {
+                    await _notificationViewModel.ShowPopupDialog(
+                        _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
+                        _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"),
+                        string.Empty, "OK", XamlRoot);
+                    return new List<double> { 0 };
+                }
           
-            _stateViewModel.RegisterJobState(name);
-            string fullPathBackup = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Backup");
-            Directory.CreateDirectory(fullPathBackup);
+                _stateViewModel.RegisterJobState(name);
+                string fullPathBackup = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Backup");
+                Directory.CreateDirectory(fullPathBackup);
 
-            await CopyDirectoryReccursively(name, source, destination, isFullBackup, textBlock);
-            await CopyDirectoryReccursively(name, source, fullPathBackup, isFullBackup, textBlock);
+                await CopyDirectoryReccursively(name, source, destination, isFullBackup, textBlock);
+                await CopyDirectoryReccursively(name, source, fullPathBackup, isFullBackup, textBlock);
 
-            _copyStopwatch.Stop();
-            _encryptionStopwatch.Start();
+                _copyStopwatch.Stop();
+                _encryptionStopwatch.Start();
 
-            await _encryptionViewModel.EncryptFile(destination, new List<string> { ".pdf", ".docx", ".txt", ".mp4" }, EncryptionKey);
+                await _encryptionViewModel.EncryptFile(destination, new List<string> { ".pdf", ".docx", ".txt", ".mp4" }, EncryptionKey);
 
-            _encryptionStopwatch.Stop();
+                _encryptionStopwatch.Stop();
 
-            _stateViewModel.CompleteJobState(name);
+                _stateViewModel.CompleteJobState(name);
 
-            textBlock.DispatcherQueue.TryEnqueue(() =>
+                textBlock.DispatcherQueue.TryEnqueue(() =>
+                {
+                    textBlock.Text = _resourceLoader.GetString("BackupPage_BackupFinished");
+                });
+            }
+            catch (Exception ex)
             {
-                textBlock.Text = _resourceLoader.GetString("BackupPage_BackupFinished");
-            });
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"❌ Erreur : {ex.Message}");
-        }
+                Console.WriteLine($"❌ Erreur : {ex.Message}");
+            }
 
-        return new List<double> { _copyStopwatch.Elapsed.TotalSeconds, _encryptionStopwatch.Elapsed.TotalSeconds };
-    }
+            return new List<double> { _copyStopwatch.Elapsed.TotalSeconds, _encryptionStopwatch.Elapsed.TotalSeconds };
+        }
 
         public async Task CopyDirectoryReccursively(string name, string source, string target, bool isFullBackup, TextBlock textBlock)
         {

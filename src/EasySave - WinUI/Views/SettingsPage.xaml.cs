@@ -14,7 +14,8 @@ namespace EasySave___WinUI.Views;
 // TODO: Set the URL for your privacy policy by updating SettingsPage_PrivacyTermsLink.NavigateUri in Resources.resw.
 public sealed partial class SettingsPage : Page
 {
-    private LogEntryViewModel logEntryViewModel = LogEntryViewModel.GetLogEntryViewModelInstance();
+    private LogEntryViewModel logEntryViewModel;
+    public BackupViewModel _backupViewModel; 
     public SettingsViewModel ViewModel 
     {
         get;
@@ -23,9 +24,16 @@ public sealed partial class SettingsPage : Page
     public SettingsPage()
     {
         ViewModel = App.GetService<SettingsViewModel>();
+        logEntryViewModel = LogEntryViewModel.GetLogEntryViewModelInstance();
+        _backupViewModel = BackupViewModel.GetBackupViewModelInstance(App.MainWindow.Content.XamlRoot);
+        
+        
         InitializeComponent();
+
+
         this.Loaded += SettingsPage_Loaded;
         ExtensionsListView.SelectionChanged += ExtensionsListView_SelectionChanged;
+        
     }
 
     private void LanguageSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -45,14 +53,14 @@ public sealed partial class SettingsPage : Page
         }
     }
 
-    private void ExtensionsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        ViewModel.SelectedExtensions.Clear();
-        foreach (var item in ExtensionsListView.SelectedItems)
+        private void ExtensionsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ViewModel.SelectedExtensions.Add(item.ToString());
+            _backupViewModel.priorityExtensions.Clear();
+            foreach (var item in ExtensionsListView.SelectedItems)
+            {
+                _backupViewModel.priorityExtensions.Add(item.ToString());
+            }
         }
-    }
 
 
         private void SettingsPage_Loaded(object sender, RoutedEventArgs e)
