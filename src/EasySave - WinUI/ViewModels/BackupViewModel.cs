@@ -28,8 +28,14 @@ namespace EasySave___WinUI.ViewModels {
 
         private readonly List<Thread> _backupThreads = new();
         private readonly List<BackupService> _activeBackupServices = new();
+        public List<string> priorityExtensions { get; set; } = new List<string> { ".iso" };
+        public int maxParallelSizeKb { get; private set; } = 50000;
 
-        public BackupState CurrentBackupState { get; private set; } = BackupState.Stopped;
+        public BackupState CurrentBackupState { get; set; } = BackupState.Stopped;
+
+        public BackupViewModel()
+        {
+        }
 
         private BackupViewModel(XamlRoot xamlRoot) {
             _socketServer = new BackupSocketServer();
@@ -55,6 +61,7 @@ namespace EasySave___WinUI.ViewModels {
 
         public async Task StartBackup(string name, string source, string destination, bool isFullBackup, string backupEncryptionKey, TextBlock textBlock) {
             var backupService = GetBackupServiceInstance(isFullBackup);
+            backupService.priorityExtensions = priorityExtensions;
             backupService.EncryptionKey = backupEncryptionKey;
 
             _socketServer.RegisterBackupService(name, backupService);
@@ -96,6 +103,15 @@ namespace EasySave___WinUI.ViewModels {
                 _activeBackupServices.Remove(backupService);
             }
         }
+      
+        public void SetPriorityExtension(List<string> extensions)
+        {
+            priorityExtensions = new List<string>(extensions);
+        }
 
+        public void SetMaxParallelSizeKb(int sizeKb)
+        {
+            maxParallelSizeKb = sizeKb;
+        }
     }
 }
