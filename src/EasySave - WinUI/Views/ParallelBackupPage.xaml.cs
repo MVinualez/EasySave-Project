@@ -21,8 +21,21 @@ namespace EasySave___WinUI.Views {
                 bool isFullBackup = true;
                 string encryptionKey = "";
 
-                await _backupViewModel.StartBackup(job.Name, job.Source, job.Destination, isFullBackup, encryptionKey, ProgressTextBox);
-                ViewModel.BackupStatus = $"Sauvegarde {job.Name} en cours...";
+                // Trouver le parent StackPanel des boutons
+                var buttonStackPanel = button.Parent as StackPanel;
+                if (buttonStackPanel != null) {
+                    // Trouver le parent général de l'item (StackPanel principal de l'élément de la ListView)
+                    var mainStackPanel = buttonStackPanel.Parent as StackPanel;
+                    if (mainStackPanel != null) {
+                        // Trouver le TextBlock dans le StackPanel principal
+                        var progressTextBlock = mainStackPanel.Children.OfType<TextBlock>().FirstOrDefault(tb => tb.Name == "ProgressTextBlock");
+
+                        if (progressTextBlock != null) {
+                            await _backupViewModel.StartBackup(job.Name, job.Source, job.Destination, isFullBackup, encryptionKey, progressTextBlock);
+                            ViewModel.BackupStatus = $"Sauvegarde {job.Name} en cours...";
+                        }
+                    }
+                }
             }
         }
 

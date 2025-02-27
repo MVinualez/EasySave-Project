@@ -19,22 +19,32 @@
             <ListView ItemsSource="{Binding SavedBackups, Mode=OneWay}">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="models:BackupJobInfoModel">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock Text="{x:Bind Name}" FontSize="18"/>
-                            <TextBlock Text="{x:Bind Source}" FontSize="14" Foreground="Gray"/>
-                            <TextBlock Text="{x:Bind Destination}" FontSize="14" Foreground="Gray"/>
+                        <StackPanel Orientation="Vertical" Spacing="5">
 
-                            <Button Content="▶ Démarrer" Click="OnRunBackup" Tag="{Binding}"/>
-                            <Button Content="⏸ Pause" Click="OnPauseBackup" Tag="{Binding}"/>
-                            <Button Content="⏯ Reprendre" Click="OnResumeBackup" Tag="{Binding}"/>
-                            <Button Content="⏹ Stop" Click="OnStopBackup" Tag="{Binding}"/>
+                            <!-- Informations de la sauvegarde -->
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="{x:Bind Name}" FontSize="18"/>
+                                <TextBlock Text="{x:Bind Source}" FontSize="14" Foreground="Gray"/>
+                                <TextBlock Text="{x:Bind Destination}" FontSize="14" Foreground="Gray"/>
+                            </StackPanel>
+
+                            <!-- Boutons sous les informations -->
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Button Content="▶ Démarrer" Click="OnRunBackup" Tag="{Binding}"/>
+                                <Button Content="⏸ Pause" Click="OnPauseBackup" Tag="{Binding}"/>
+                                <Button Content="⏯ Reprendre" Click="OnResumeBackup" Tag="{Binding}"/>
+                                <Button Content="⏹ Stop" Click="OnStopBackup" Tag="{Binding}"/>
+                            </StackPanel>
+
+                            <!-- TextBlock qui affichera la progression en bas -->
+                            <TextBlock x:Name="ProgressTextBlock" FontSize="14" Foreground="Blue"/>
+
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
 
             <TextBlock Text="{Binding BackupStatus}" FontSize="16" Foreground="Blue" Margin="0,10,0,0"/>
-            <TextBlock x:Name="ProgressTextBox" Grid.Row="6" Grid.Column="1" Margin="0,30,0,5"/>
         </StackPanel>
     </Grid>
 </Page>
