@@ -25,9 +25,9 @@
                             <TextBlock Text="{x:Bind Destination}" FontSize="14" Foreground="Gray"/>
 
                             <Button Content="▶ Démarrer" Click="OnRunBackup" Tag="{Binding}"/>
-                            <Button Content="⏸ Pause" Click="OnPauseBackup"/>
-                            <Button Content="⏯ Reprendre" Click="OnResumeBackup"/>
-                            <Button Content="⏹ Stop" Click="OnStopBackup"/>
+                            <Button Content="⏸ Pause" Click="OnPauseBackup" Tag="{Binding}"/>
+                            <Button Content="⏯ Reprendre" Click="OnResumeBackup" Tag="{Binding}"/>
+                            <Button Content="⏹ Stop" Click="OnStopBackup" Tag="{Binding}"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
