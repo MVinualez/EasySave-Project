@@ -44,7 +44,7 @@ namespace EasySave___WinUI.Services {
             int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
             string command = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim();
 
-            string response = "INVALID_COMMAND"
+            string response = "INVALID_COMMAND";
 
             if (command.StartsWith("PAUSE ")) {
                 string jobName = command.Substring(6);
