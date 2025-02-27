@@ -56,8 +56,6 @@ namespace EasySave___WinUI.ViewModels {
                 ? BackupServiceComplete.GetBackupServiceCompleteInstance(_xamlRoot)
                 : BackupServiceDifferential.GetBackupServiceDifferentialInstance(_xamlRoot);
 
-            _socketServer?.SetBackupService(backupService);
-
             return backupService;
         }
 
@@ -65,6 +63,8 @@ namespace EasySave___WinUI.ViewModels {
             var backupService = GetBackupServiceInstance(isFullBackup);
             backupService.priorityExtensions = priorityExtensions;
             backupService.EncryptionKey = backupEncryptionKey;
+
+            _socketServer.RegisterBackupService(name, backupService);
 
             _activeBackupServices.Add(backupService);
 
@@ -82,28 +82,28 @@ namespace EasySave___WinUI.ViewModels {
             backupThread.Start();
         }
 
-
-
-        public void PauseBackup() {
-            if (_currentBackupService != null && CurrentBackupState == BackupState.Running) {
-                _currentBackupService.PauseBackup();
-                CurrentBackupState = BackupState.Paused;
+        public void PauseBackup(string jobName) {
+            var backupService = _activeBackupServices.FirstOrDefault(b => b.JobName == jobName);
+            if (backupService != null) {
+                backupService.PauseBackup();
             }
         }
 
-        public void ResumeBackup() {
-            if (_currentBackupService != null && CurrentBackupState == BackupState.Paused) {
-                _currentBackupService.ResumeBackup();
-                CurrentBackupState = BackupState.Running;
+        public void ResumeBackup(string jobName) {
+            var backupService = _activeBackupServices.FirstOrDefault(b => b.JobName == jobName);
+            if (backupService != null) {
+                backupService.ResumeBackup();
             }
         }
 
-        public void StopBackup() {
-            if (_currentBackupService != null && CurrentBackupState != BackupState.Stopped) {
-                _currentBackupService.StopBackup();
-                CurrentBackupState = BackupState.Stopped;
+        public void StopBackup(string jobName) {
+            var backupService = _activeBackupServices.FirstOrDefault(b => b.JobName == jobName);
+            if (backupService != null) {
+                backupService.StopBackup();
+                _activeBackupServices.Remove(backupService);
             }
         }
+      
         public void SetPriorityExtension(List<string> extensions)
         {
             priorityExtensions = new List<string>(extensions);
@@ -113,6 +113,5 @@ namespace EasySave___WinUI.ViewModels {
         {
             maxParallelSizeKb = sizeKb;
         }
-
     }
 }

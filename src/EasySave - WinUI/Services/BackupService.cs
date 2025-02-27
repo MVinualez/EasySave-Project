@@ -25,6 +25,7 @@ namespace EasySave___WinUI.Services {
         private volatile bool largeFileInProgress = false;        
         public XamlRoot XamlRoot { get; }
         public string EncryptionKey { get; set; }
+        public string JobName { get; set; }
 
         protected BackupService(XamlRoot xamlRoot) {
             XamlRoot = xamlRoot;
@@ -77,8 +78,9 @@ namespace EasySave___WinUI.Services {
             });
         }
       
-        public async Task<List<double>> RunBackup(string name, string source, string destination, bool isFullBackup, TextBlock textBlock)
-        {
+        public async Task<List<double>> RunBackup(string name, string source, string destination, bool isFullBackup, TextBlock textBlock) {
+            JobName = name;
+
             _copyStopwatch.Start();
             try
             {
