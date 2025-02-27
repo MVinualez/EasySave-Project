@@ -50,14 +50,14 @@ namespace EasySave___WinUI.ViewModels {
                 ? BackupServiceComplete.GetBackupServiceCompleteInstance(_xamlRoot)
                 : BackupServiceDifferential.GetBackupServiceDifferentialInstance(_xamlRoot);
 
-            _socketServer?.SetBackupService(backupService);
-
             return backupService;
         }
 
         public async Task StartBackup(string name, string source, string destination, bool isFullBackup, string backupEncryptionKey, TextBlock textBlock) {
             var backupService = GetBackupServiceInstance(isFullBackup);
             backupService.EncryptionKey = backupEncryptionKey;
+
+            _socketServer.RegisterBackupService(name, backupService);
 
             _activeBackupServices.Add(backupService);
 
