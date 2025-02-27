@@ -26,6 +26,7 @@ namespace EasySave___WinUI.Services {
         public XamlRoot XamlRoot { get; }
         public string EncryptionKey { get; set; }
         public string JobName { get; set; }
+        private readonly object lockObj = new();
 
         protected BackupService(XamlRoot xamlRoot) {
             XamlRoot = xamlRoot;
@@ -154,7 +155,7 @@ namespace EasySave___WinUI.Services {
                 ///
                 if (fileSizeKb > maxParallelSizeKb)
                 {
-                    lock (this)
+                    lock (lockObj)
                     {
                         while (largeFileInProgress) // Attendre la fin du transfert en cours
                         {
@@ -182,7 +183,7 @@ namespace EasySave___WinUI.Services {
                 });
                 if (fileSizeKb > maxParallelSizeKb)
                 {
-                    lock (this)
+                    lock (lockObj)
                     {
                         largeFileInProgress = false;
                     }
