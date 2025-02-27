@@ -18,8 +18,8 @@ namespace EasySave___WinUI.Views {
 
         private async void OnRunBackup(object sender, RoutedEventArgs e) {
             if (sender is Button button && button.Tag is BackupJobInfoModel job) {
-                bool isFullBackup = true;  // Par défaut, exécution en mode complet
-                string encryptionKey = ""; // Pas de clé de chiffrement pour l'instant
+                bool isFullBackup = true;
+                string encryptionKey = "";
 
                 await _backupViewModel.StartBackup(job.Name, job.Source, job.Destination, isFullBackup, encryptionKey, ProgressTextBox);
                 ViewModel.BackupStatus = $"Sauvegarde {job.Name} en cours...";
@@ -27,18 +27,24 @@ namespace EasySave___WinUI.Views {
         }
 
         private void OnPauseBackup(object sender, RoutedEventArgs e) {
-            _backupViewModel.PauseBackup();
-            ViewModel.BackupStatus = "Sauvegarde en pause";
+            if (sender is Button button && button.Tag is BackupJobInfoModel job) {
+                _backupViewModel.PauseBackup(job.Name);
+                ViewModel.BackupStatus = $"Sauvegarde {job.Name} en pause";
+            }
         }
 
         private void OnResumeBackup(object sender, RoutedEventArgs e) {
-            _backupViewModel.ResumeBackup();
-            ViewModel.BackupStatus = "Sauvegarde en cours...";
+            if (sender is Button button && button.Tag is BackupJobInfoModel job) {
+                _backupViewModel.ResumeBackup(job.Name);
+                ViewModel.BackupStatus = $"Sauvegarde {job.Name} en cours...";
+            }
         }
 
         private void OnStopBackup(object sender, RoutedEventArgs e) {
-            _backupViewModel.StopBackup();
-            ViewModel.BackupStatus = "Sauvegarde arrêtée";
+            if (sender is Button button && button.Tag is BackupJobInfoModel job) {
+                _backupViewModel.StopBackup(job.Name);
+                ViewModel.BackupStatus = $"Sauvegarde {job.Name} arrêtée";
+            }
         }
     }
 }

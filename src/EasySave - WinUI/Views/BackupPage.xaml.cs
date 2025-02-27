@@ -64,14 +64,14 @@ public sealed partial class BackupPage : Page
     }
 
     private void PauseBackup_Click(object sender, RoutedEventArgs e) {
-        _backupViewModel.PauseBackup();
+        //_backupViewModel.PauseBackup();
     }
 
     private void ResumeBackup_Click(object sender, RoutedEventArgs e) {
-        _backupViewModel.ResumeBackup();
+        //_backupViewModel.ResumeBackup();
     }
 
     private void StopBackup_Click(object sender, RoutedEventArgs e) {
-        _backupViewModel.StopBackup();
+        //_backupViewModel.StopBackup();
     }
 }

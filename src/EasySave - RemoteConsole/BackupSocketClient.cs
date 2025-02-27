@@ -13,21 +13,22 @@ namespace RemoteConsole {
             _port = port;
         }
 
-        public async Task SendCommand(string command) {
+        public async Task SendCommand(string command, string jobName) {
             try {
                 using TcpClient client = new TcpClient();
                 await client.ConnectAsync(_serverIp, _port);
                 NetworkStream stream = client.GetStream();
-                byte[] data = Encoding.UTF8.GetBytes(command);
+                string fullCommand = $"{command} {jobName}";
+                byte[] data = Encoding.UTF8.GetBytes(fullCommand);
                 await stream.WriteAsync(data, 0, data.Length);
 
                 byte[] responseBuffer = new byte[1024];
                 int bytesRead = await stream.ReadAsync(responseBuffer, 0, responseBuffer.Length);
                 string response = Encoding.UTF8.GetString(responseBuffer, 0, bytesRead);
 
-                Console.WriteLine($"📨 Réponse du serveur : {response}");
+                Console.WriteLine($"\ud83d\udce8 Réponse du serveur : {response}");
             } catch (Exception ex) {
-                Console.WriteLine($"❌ Erreur client : {ex.Message}");
+                Console.WriteLine($"\u274c Erreur client : {ex.Message}");
             }
         }
     }
