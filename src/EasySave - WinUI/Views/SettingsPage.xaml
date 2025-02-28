@@ -11,7 +11,8 @@
         <helpers:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
     </Page.Resources>
     <Grid>
-        <StackPanel
+        <ScrollViewer VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel
             x:Name="ContentArea">
             <TextBlock x:Uid="Settings_Personalization" Style="{ThemeResource SubtitleTextBlockStyle}" />
             <StackPanel Margin="{StaticResource SmallTopBottomMargin}">
@@ -50,7 +51,7 @@
                     </RadioButton>
                 </StackPanel>
             </StackPanel>
-
+    
             <TextBlock x:Uid="Settings_Language" Text="Language" />
             <ComboBox x:Name="LanguageSelector"
               SelectionChanged="LanguageSelector_SelectionChanged"
@@ -60,6 +61,21 @@
                     <ComboBoxItem Tag="es-419">Español (Latinoamérica)</ComboBoxItem>
             </ComboBox>
 
+            <RadioButton x:Name="JsonRadioButton" Content="JSON" GroupName="LogFormatGroup" IsChecked="True" Checked="LogFormat_Checked"/>
+                <RadioButton x:Name="XmlRadioButton" Content="XML" GroupName="LogFormatGroup" Checked="LogFormat_Checked"/>
+                <StackPanel Padding="20">
+                <TextBlock Text="Advanced settings EasySave" FontSize="20" FontWeight="Bold"/>
+                <TextBlock Text="Priority Extensions" Margin="0,10,0,0"/>
+                <ListView x:Name="ExtensionsListView"
+                  ItemsSource="{x:Bind ViewModel.AvailableExtensions, Mode=OneWay}"
+                  SelectionMode="Multiple">
+                </ListView>
+
+                <TextBlock Text="Maximum size in parallel (KB)" Margin="0,10,0,0"/>
+                <TextBox Text="{x:Bind ViewModel.MaxParallelSizeKb, Mode=TwoWay}"/>
+
+                <Button Content="Save" Command="{x:Bind ViewModel.SaveSettingsCommand}" Margin="0,10,0,0"/>
+            </StackPanel>
 
             <TextBlock x:Uid="Settings_About" Style="{ThemeResource SubtitleTextBlockStyle}" />
 
@@ -67,5 +83,6 @@
                 <TextBlock Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}" Style="{ThemeResource BodyTextBlockStyle}"/>
             </StackPanel>
         </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

@@ -11,19 +11,19 @@
         <helpers:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
     </Page.Resources>
 
-    <Grid Padding="20" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto" ColumnDefinitions="Auto, *" x:Name="ContentArea">
+    <Grid Padding="20" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto" ColumnDefinitions="Auto, *" x:Name="ContentArea">
         <TextBlock x:Uid="BackupPage_BackupName" Margin="0,0,30,5"/>
         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
             <TextBox x:Name="BackupNameTextBox" Width="200" Margin="0,0,0,5"/>
         </StackPanel>
 
-        <TextBlock x:Uid="BackupPage_DestinationFolder" Grid.Row="1" Margin="0,0,30,5"/>
+        <TextBlock x:Uid="BackupPage_SourceFolder" Grid.Row="1" Margin="0,0,30,5"/>
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
             <Button x:Uid="BackupPage_Browse" Click="SelectSourceFolder_Click" Margin="0,0,0,0"/>
             <TextBlock x:Name="SourcePathText" x:Uid="BackupPage_NoFolderSelected" VerticalAlignment="Center"/>
         </StackPanel>
 
-        <TextBlock x:Uid="BackupPage_SourceFolder" Grid.Row="2" Margin="0,0,30,5"/>
+        <TextBlock x:Uid="BackupPage_DestinationFolder" Grid.Row="2" Margin="0,0,30,5"/>
         <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
             <Button x:Uid="BackupPage_Browse" Click="SelectDestinationFolder_Click" Margin="0,0,0,0"/>
             <TextBlock x:Name="DestinationPathText" x:Uid="BackupPage_NoFolderSelected" VerticalAlignment="Center"/>
@@ -40,7 +40,14 @@
             <TextBox x:Name="BackupEncryptionKeyTextBox" Width="200" Margin="0,0,0,5"/>
         </StackPanel>
         
-        <TextBlock x:Name="ProgressTextBox" Grid.Row="5" Grid.Column="1" Margin="0,0,30,5"/>
-        <Button Grid.Row="6" x:Uid="BackupPage_StartBackup" Click="StartBackup_Click" Margin="0,10,0,0"/>
+        <Button Grid.Row="5" Grid.Column="0" x:Uid="BackupPage_StartBackup" Click="StartBackup_Click" Margin="5,15,5,5"/>
+
+        <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" Margin="0,10,0,0">
+            <Button x:Name="PauseButton" Content="⏸ Pause" Click="PauseBackup_Click" Margin="5"/>
+            <Button x:Name="ResumeButton" Content="▶ Reprendre" Click="ResumeBackup_Click" Margin="5"/>
+            <Button x:Name="StopButton" Content="⏹ Stop" Click="StopBackup_Click" Margin="5"/>
+        </StackPanel>
+        
+        <TextBlock x:Name="ProgressTextBox" Grid.Row="6" Grid.Column="1" Margin="0,30,0,5"/>
     </Grid>
 </Page>

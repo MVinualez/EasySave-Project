@@ -17,6 +17,7 @@ public class PageService : IPageService
         Configure<BackupViewModel, BackupPage>();
         Configure<RestoreViewModel, RestorePage>();
         Configure<SettingsViewModel, SettingsPage>();
+        Configure<ParallelBackupViewModel, ParallelBackupPage>();
     }
 
     public Type GetPageType(string key)

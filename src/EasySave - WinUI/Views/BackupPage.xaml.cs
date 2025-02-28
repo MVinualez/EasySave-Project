@@ -4,8 +4,7 @@ using Windows.Storage;
 using WinRT.Interop;
 using Microsoft.UI.Xaml;
 using EasySave___WinUI.Services;
-using EasySave___WinUI.Controllers;
-using EasySaveLibrary.Controllers;
+using EasySaveLibrary.Services;
 using System.Diagnostics;
 using EasySaveLibrary.Models;
 using Windows.ApplicationModel.Resources;
@@ -15,20 +14,13 @@ namespace EasySave___WinUI.Views;
 
 public sealed partial class BackupPage : Page
 {
-    private BackupJobController _backupJobController;
-    private readonly LogController _logController;
-    private readonly ResourceLoader _resourceLoader;
-    private readonly NotificationViewModel _notificationViewModel;
-    private readonly StateViewModel _stateViewModel;
+
+    private readonly BackupViewModel _backupViewModel;
 
     public BackupPage()
     {
+        _backupViewModel = BackupViewModel.GetBackupViewModelInstance(this.XamlRoot);
         InitializeComponent();
-
-        _resourceLoader = new ResourceLoader();
-        _notificationViewModel = NotificationViewModel.GetNotificationViewModelInstance();
-        _stateViewModel = StateViewModel.GetStateViewModelInstance(this.XamlRoot);
-        this._logController = LogController.GetInstanceLogController();
     }
 
     private async void SelectSourceFolder_Click(object sender, RoutedEventArgs e)
@@ -59,85 +51,27 @@ public sealed partial class BackupPage : Page
         }
     }
 
-    private async void StartBackup_Click(object sender, RoutedEventArgs e)
-    {
-        BackupService backupService = BackupService.getInstanceBackupService();
-        backupService.encryptionKey = BackupEncryptionKeyTextBox.Text;
-        this._backupJobController = new BackupJobController(backupService);
 
-        // Check if Office apps are running before proceeding
-        bool canStart = await _backupJobController.CanStartBackup(this.XamlRoot);
-        if (!canStart)
-        {
-            await _notificationViewModel.ShowPopupDialog(_resourceLoader.GetString("Backup_OfficeCanceled"), _resourceLoader.GetString("Backup_OfficeCanceled"), String.Empty, "OK", this.XamlRoot);
-            return;
-        }
+    private async void StartBackup_Click(object sender, RoutedEventArgs e) {
+        bool isFullBackup = CompleteBackupRadioButton.IsChecked ?? true;
 
         var backupName = BackupNameTextBox?.Text ?? "";
         var sourcePath = SourcePathText?.Text;
         var destinationPath = DestinationPathText?.Text;
+        var encryptionKey = BackupEncryptionKeyTextBox?.Text;
 
-        DirectoryInfo di = new DirectoryInfo(sourcePath);
-        long fileSize = di.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(fi => fi.Length);
-
-        if (string.IsNullOrWhiteSpace(backupName) || sourcePath == _resourceLoader.GetString("BackupPage_NoFolderSelected") || destinationPath == _resourceLoader.GetString("BackupPage_NoFolderSelected"))
-        {
-            await _notificationViewModel.ShowPopupDialog(_resourceLoader.GetString("BackupPage_FillAllFieldsError"), _resourceLoader.GetString("BackupPage_FillAllFieldsError"), String.Empty, "OK", this.XamlRoot);
-            return;
-        }
-
-        try
-        {
-            stateCreator(backupName, sourcePath, destinationPath);
-
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            if (DifferentialBackupRadioButton.IsChecked == true)
-            {
-                _backupJobController.StartDiffBackup(backupName, sourcePath, destinationPath, CompleteBackupRadioButton.IsChecked ?? true);
-            }
-            else
-            {
-                _backupJobController.StartBackup(backupName, sourcePath, destinationPath, CompleteBackupRadioButton.IsChecked ?? true);
-            }
-            stopwatch.Stop();
-
-            double elapsedTime = stopwatch.Elapsed.TotalSeconds;
-            LogEntry logEntry = new LogEntry(backupName, sourcePath, destinationPath, fileSize, elapsedTime);
-            _logController.SaveLog(logEntry);
-        }
-        catch (Exception ex)
-        {
-            await _notificationViewModel.ShowPopupDialog($"{_resourceLoader.GetString("BackupPage_BackupError")} {ex.Message}", $"{_resourceLoader.GetString("BackupPage_BackupError")} {ex.Message}", String.Empty, "OK", this.XamlRoot);
-        }
+        await _backupViewModel.StartBackup(backupName, sourcePath, destinationPath, isFullBackup, encryptionKey, ProgressTextBox);
     }
 
-    // Lancer la sauvegarde
-  
+    private void PauseBackup_Click(object sender, RoutedEventArgs e) {
+        //_backupViewModel.PauseBackup();
+    }
 
-    private async void stateCreator(string backupName, string sourcePath, string destinationPath)
-    {
-        _stateViewModel.RegisterJobState(backupName);
-        if (!Directory.Exists(sourcePath))
-        {
-            await _notificationViewModel.ShowPopupDialog(_resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"), _resourceLoader.GetString("BackupPage_SourceFolderDoesntExists"), String.Empty, "OK", this.XamlRoot);
-            return;
-        }
-        string[] files = Directory.GetFiles(sourcePath);
+    private void ResumeBackup_Click(object sender, RoutedEventArgs e) {
+        //_backupViewModel.ResumeBackup();
+    }
 
-        foreach (var file in files)
-        {
-            string fileName = Path.GetFileName(file);
-            string destFile = Path.Combine(destinationPath, fileName);
-            long fileSize = new FileInfo(file).Length;
-            int fileSizeInt = (int)fileSize;
-
-            _stateViewModel.TrackFileInState(backupName, file, destFile, fileSizeInt);
-            ProgressTextBox.Text = String.Format(_resourceLoader.GetString("BackupPage_BackupInProgress"), fileName);
-            //File.Copy(file, destFile, true);
-
-            _stateViewModel.MarkFileAsProcessed(backupName, file, fileSizeInt);
-        }
-        _stateViewModel.CompleteJobState(backupName);
-        ProgressTextBox.Text = _resourceLoader.GetString("BackupPage_BackupFinished");
+    private void StopBackup_Click(object sender, RoutedEventArgs e) {
+        //_backupViewModel.StopBackup();
     }
 }

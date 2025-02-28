@@ -251,4 +251,13 @@
   <data name="Backup_OfficeCanceled" xml:space="preserve">
     <value>Sauvegarde annulée en raison de l'exécution d'applications Office.</value>
   </data>
+  <data name="BackupPage_BackupPaused" xml:space="preserve">
+    <value>🕰️ Sauvegarde en pause...</value>
+  </data>
+  <data name="BackupPage_BackupResumed" xml:space="preserve">
+    <value>⏰ Reprise de la sauvegarde</value>
+  </data>
+  <data name="Shell_ParallelBackup.Content" xml:space="preserve">
+    <value>Sauvegarde Parallèle</value>
+  </data>
 </root>

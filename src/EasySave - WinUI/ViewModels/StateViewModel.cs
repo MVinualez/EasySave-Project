@@ -30,7 +30,7 @@ namespace EasySave___WinUI.ViewModels {
         /// <param name="sourceFilePath"></param>
         /// <param name="targetFilePath"></param>
         /// <param name="fileSize"></param>
-        public void TrackFileInState(string jobName, string sourceFilePath, string targetFilePath, int fileSize) {
+        public void TrackFileInState(string jobName, string sourceFilePath, string targetFilePath, long fileSize) {
             _stateService.AddFileToState(jobName, sourceFilePath, targetFilePath, fileSize);
         }
 
@@ -40,7 +40,7 @@ namespace EasySave___WinUI.ViewModels {
         /// <param name="jobName"></param>
         /// <param name="sourceFilePath"></param>
         /// <param name="fileSize"></param>
-        public void MarkFileAsProcessed(string jobName, string sourceFilePath, int fileSize) {
+        public void MarkFileAsProcessed(string jobName, string sourceFilePath, long fileSize) {
             _stateService.UpdateFileTransfer(jobName, sourceFilePath, fileSize);
         }
 
